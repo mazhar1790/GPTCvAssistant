@@ -1,0 +1,138 @@
+﻿body {
+    background: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.chat-container {
+    max-width: 800px;
+    margin: 3rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+.chat-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+    .chat-header h1 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+
+.input-group > input {
+    border-right: none;
+}
+
+.btn-submit {
+    background: #6f42c1;
+    color: white;
+    border: 1px solid #6f42c1;
+}
+
+    .btn-submit:hover {
+        background: #5a32a3;
+        border-color: #5a32a3;
+    }
+
+    .btn-submit:disabled {
+        background: #6c757d;
+        border-color: #6c757d;
+    }
+
+.response-box {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f1f3f5;
+    border-left: 4px solid #6f42c1;
+    border-radius: 0.5rem;
+}
+
+.chat-history {
+    margin-bottom: 2rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.chat-entry {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 0.5rem;
+}
+
+    .chat-entry:last-child {
+        border-bottom: none;
+    }
+
+    .chat-entry strong {
+        color: #6f42c1;
+    }
+
+.action-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.dark-mode {
+    background-color: #121212 !important;
+    color: #e4e4e4 !important;
+}
+
+    .dark-mode .chat-container {
+        background-color: #1e1e1e;
+        color: #e4e4e4;
+    }
+
+    .dark-mode .response-box {
+        background-color: #2a2a2a;
+        border-left-color: #9b6bff;
+    }
+
+    .dark-mode .chat-entry {
+        border-color: #444;
+    }
+
+.typing-indicator {
+    display: none;
+    font-style: italic;
+    color: #6c757d;
+}
+
+    .typing-indicator::after {
+        content: '...';
+        animation: dots 1.5s steps(4, end) infinite;
+    }
+
+@keyframes dots {
+    0%, 20% {
+        color: transparent;
+        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
+    }
+
+    40% {
+        color: #6c757d;
+        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
+    }
+
+    60% {
+        text-shadow: .25em 0 0 #6c757d, .5em 0 0 transparent;
+    }
+
+    80%, 100% {
+        text-shadow: .25em 0 0 #6c757d, .5em 0 0 #6c757d;
+    }
+}
+
+.alert-dismissible {
+    margin-bottom: 1rem;
+}
+#submitBtn, #clearBtn, #downloadBtn, #voiceBtn {
+    z-index: 10;
+    position: relative;
+    pointer-events: auto;
+}
