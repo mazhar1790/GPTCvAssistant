@@ -8,19 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CV GPT Assistant</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="~/content/css/chat.css" rel="stylesheet" />
-    <style>
-        
-    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <button id="themeToggle" class="btn btn-sm btn-outline-dark position-absolute end-0 m-3">🌙</button>
+    <button id="themeToggle" class="btn">🌙</button>
 
     <div class="chat-container">
         <div class="chat-header">
-            <h1>💼 CV GPT Assistant</h1>
+            <h1><i class="fas fa-briefcase me-3"></i>CV GPT Assistant</h1>
             <p class="text-muted">Ask anything about Mazhar Hayat's professional experience</p>
         </div>
 
@@ -28,8 +26,12 @@
         <div id="alertContainer"></div>
 
         <div class="action-bar">
-            <button id="clearBtn" type="button" class="btn btn-outline-danger btn-sm">🗑 Clear History</button>
-            <button id="downloadBtn" type="button" class="btn btn-outline-primary btn-sm">⬇️ Download Transcript</button>
+            <button id="clearBtn" type="button" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash me-2"></i>Clear History
+            </button>
+            <button id="downloadBtn" type="button" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-download me-2"></i>Download Transcript
+            </button>
         </div>
 
         <div id="chatHistory" class="chat-history">
@@ -38,25 +40,32 @@
                 @foreach (var item in Model.History)
                 {
                     <div class="chat-entry">
-                        <p><strong>You:</strong> @item.UserQuestion</p>
-                        <p><strong>GPT:</strong> @item.Answer</p>
+                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> @item.UserQuestion</p>
+                        <p><strong><i class="fas fa-robot me-2"></i>GPT:</strong> @item.Answer</p>
                     </div>
                 }
             }
             else
             {
-                <div class="text-center text-muted">
-                    <p>No chat history yet. Ask your first question!</p>
+                <div class="text-center text-muted glass-effect" style="padding: 3rem; border-radius: 16px;">
+                    <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                    <p class="mb-0">No chat history yet. Ask your first question!</p>
                 </div>
             }
         </div>
 
-        <div class="typing-indicator" id="typingIndicator">GPT is thinking</div>
+        <div class="typing-indicator" id="typingIndicator">
+            <i class="fas fa-robot me-2"></i>GPT is thinking
+        </div>
 
         <div class="input-group">
-            <input type="text" id="userQuestion" class="form-control" placeholder="Ask a question..." maxlength="500">
-            <button type="button" class="btn btn-outline-secondary" id="voiceBtn">🎤</button>
-            <button type="button" id="submitBtn" class="btn btn-submit">Ask</button>
+            <input type="text" id="userQuestion" class="form-control me-2" placeholder="Ask a question..." maxlength="500">
+            <button type="button" class="btn me-2" id="voiceBtn">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button type="button" id="submitBtn" class="btn btn-submit">
+                <i class="fas fa-paper-plane me-2"></i>Ask
+            </button>
         </div>
     </div>
 
@@ -64,7 +73,9 @@
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="toastAlert" class="toast align-items-center text-white bg-success border-0" role="alert">
             <div class="d-flex">
-                <div class="toast-body">Done ✅</div>
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>Done ✅
+                </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
             </div>
         </div>
@@ -75,6 +86,7 @@
             constructor() {
                 this.initializeEventListeners();
                 this.loadTheme();
+                this.addParticleEffect();
             }
 
             initializeEventListeners() {
@@ -148,7 +160,12 @@
                     });
 
                     if (response.success) {
-                        $('#chatHistory').html('<div class="text-center text-muted"><p>No chat history yet. Ask your first question!</p></div>');
+                        $('#chatHistory').html(`
+                            <div class="text-center text-muted glass-effect" style="padding: 3rem; border-radius: 16px;">
+                                <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p class="mb-0">No chat history yet. Ask your first question!</p>
+                            </div>
+                        `);
                         this.showToast('History cleared successfully!');
                     } else {
                         this.showAlert(response.message || 'Failed to clear history', 'danger');
@@ -200,7 +217,7 @@
                 recognition.lang = 'en-US';
 
                 const voiceBtn = $('#voiceBtn');
-                voiceBtn.prop('disabled', true).html('🎙️');
+                voiceBtn.prop('disabled', true).html('<i class="fas fa-microphone-slash"></i>');
 
                 recognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript;
@@ -213,7 +230,7 @@
                 };
 
                 recognition.onend = () => {
-                    voiceBtn.prop('disabled', false).html('🎤');
+                    voiceBtn.prop('disabled', false).html('<i class="fas fa-microphone"></i>');
                 };
 
                 recognition.start();
@@ -227,8 +244,8 @@
 
                 const entryHtml = `
                     <div class="chat-entry">
-                        <p><strong>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
-                        <p><strong>GPT:</strong> ${this.escapeHtml(exchange.answer)}</p>
+                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
+                        <p><strong><i class="fas fa-robot me-2"></i>GPT:</strong> ${this.escapeHtml(exchange.answer)}</p>
                     </div>
                 `;
 
@@ -241,11 +258,11 @@
                 const typingIndicator = $('#typingIndicator');
 
                 if (isLoading) {
-                    submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Thinking...');
+                    submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Thinking...');
                     userQuestion.prop('disabled', true);
                     typingIndicator.show();
                 } else {
-                    submitBtn.prop('disabled', false).html('Ask');
+                    submitBtn.prop('disabled', false).html('<i class="fas fa-paper-plane me-2"></i>Ask');
                     userQuestion.prop('disabled', false);
                     typingIndicator.hide();
                 }
@@ -257,9 +274,16 @@
             }
 
             showAlert(message, type = 'info') {
+                const icons = {
+                    'success': 'check-circle',
+                    'danger': 'exclamation-triangle',
+                    'warning': 'exclamation-circle',
+                    'info': 'info-circle'
+                };
+
                 const alertHtml = `
                     <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                        ${this.escapeHtml(message)}
+                        <i class="fas fa-${icons[type]} me-2"></i>${this.escapeHtml(message)}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
@@ -273,7 +297,7 @@
             }
 
             showToast(message) {
-                $('#toastAlert .toast-body').text(message);
+                $('#toastAlert .toast-body').html(`<i class="fas fa-check-circle me-2"></i>${message}`);
                 const toast = new bootstrap.Toast(document.getElementById('toastAlert'));
                 toast.show();
             }
@@ -297,6 +321,26 @@
                 if (localStorage.getItem('theme') === 'dark') {
                     $('body').addClass('dark-mode');
                     $('#themeToggle').text('☀️');
+                }
+            }
+
+            addParticleEffect() {
+                // Add subtle floating particles for visual appeal
+                for (let i = 0; i < 5; i++) {
+                    const particle = $('<div class="particle"></div>');
+                    particle.css({
+                        position: 'fixed',
+                        width: '4px',
+                        height: '4px',
+                        background: 'rgba(102, 126, 234, 0.3)',
+                        borderRadius: '50%',
+                        pointerEvents: 'none',
+                        zIndex: '-1',
+                        left: Math.random() * 100 + '%',
+                        top: Math.random() * 100 + '%',
+                        animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`
+                    });
+                    $('body').append(particle);
                 }
             }
 
