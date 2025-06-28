@@ -28,6 +28,20 @@
         }
         type();
 
+        addChatEntry(exchange) {
+            const historyContainer = $('#chatHistory');
+
+            // Remove "no history" message if it exists
+            historyContainer.find('.text-center.text-muted').remove();
+
+            const entryHtml = `
+            <div class="chat-entry">
+                <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
+                <p><strong><i class="fas fa-robot me-2"></i>GPT:</strong> ${this.escapeHtml(exchange.answer)}</p>
+            </div>`;
+
+            historyContainer.append(entryHtml);
+        }
 
     });
 });

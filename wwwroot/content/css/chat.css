@@ -553,3 +553,12 @@ body {
 * {
     transition: all 0.2s ease;
 }
+.chat-entry {
+    transition: all 0.2s ease;
+}
+
+    .chat-entry[style*="display: none"] {
+        opacity: 0;
+        pointer-events: none;
+    }
+

@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV GPT Assistant</title>
+    <title>Mazhar Hayat – AI-Powered Career Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="~/content/css/chat.css" rel="stylesheet" />
@@ -18,8 +18,8 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h1><i class="fas fa-briefcase me-3"></i>CV GPT Assistant</h1>
-            <p class="text-muted">Ask anything about Mazhar Hayat's professional experience</p>
+            <h2><i class="fas fa-briefcase me-3"></i>Mazhar Hayat – AI-Powered Career Profile</h2>
+            <p class="text-muted">Ask anything about Mazhar Hayat’s experience, skills, and projects — delivered through an interactive AI assistant built for career insights..</p>
         </div>
 
         <!-- Alert container for messages -->
@@ -33,6 +33,10 @@
                 <i class="fas fa-download me-2"></i>Download Transcript
             </button>
         </div>
+        <div id="searchWrapper" class="px-4 mb-3 position-relative" style="display: none;">
+            <input id="searchBox" class="form-control" type="text" placeholder="🔍 Search past questions..." />
+        </div>
+
 
         <div id="chatHistory" class="chat-history">
             @if (Model?.History != null && Model.History.Any())
@@ -112,7 +116,16 @@
 
                 // Theme toggle button
                 $('#themeToggle').click(() => this.toggleTheme());
+
+                $('#searchBox').on('input', function () {
+                        const query = $(this).val().toLowerCase();
+                        $('.chat-entry').each(function () {
+                        const text = $(this).text().toLowerCase();
+                        $(this).toggle(text.includes(query));
+                        });
+                });
             }
+            
 
             async submitQuestion() {
                 const question = $('#userQuestion').val().trim();
@@ -151,7 +164,7 @@
                 if (!confirm('Are you sure you want to clear the chat history?')) {
                     return;
                 }
-
+                $('#searchWrapper').hide();
                 try {
                     const response = await $.ajax({
                         url: '/Chat/ClearHistory',
@@ -354,6 +367,10 @@
         // Initialize the app when the page loads
         $(document).ready(() => {
             new ChatApp();
+
+         if ($('.chat-entry').length >= 9) {
+            $('#searchWrapper').show();
+        }
         });
     </script>
 </body>
