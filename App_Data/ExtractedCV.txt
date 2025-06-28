@@ -1,0 +1,68 @@
+﻿Contact
+Dubai, United Arab Emirates
++971556127178 (Mobile)
+mazhar.jutt555@gmail.com
+www.linkedin.com/in/mazharhayyat(LinkedIn)
+mazharhayat.me/ (Personal)
+Top Skills
+OpenAI / GPT-4 / GPT-3.5
+AI Model Integration & APIEngineering
+Vector Databases (e.g., Pinecone,FAISS, Azure Cognitive Search)
+Languages
+English
+urdu
+Honors-Awards
+Two Years Full Fee Scholarship
+Head Prefect
+Mazhar Hayat
+AI Solutions Architect | Full Stack Lead | Expert in LLMs, GPT-4,RAG , Chatbot Systems & Generative AI Integration
+Abu Dhabi Emirate, United Arab Emirates
+Summary
+I am an AI-focused Solutions Architect and Full-Stack EngineeringLead with over 15 years of experience delivering enterprise-scale,intelligent systems across government and public sector domains.My core expertise lies in architecting production-ready platformspowered by advanced artificial intelligence — including GPT-4, fine-tuned LLMs, Retrieval-Augmented Generation (RAG), and naturallanguage interfaces — to drive smarter automation, improve servicedelivery, and unlock real-time insights from organizational data.I specialize in implementing OpenAI models and custom LLMs usingLangChain, Azure OpenAI, and vector databases like Pinecone,FAISS, and Azure Cognitive Search. I build and integrate RAGpipelines for secure document retrieval, design conversational AIsystems with Azure Bot Framework and ChatGPT, and implementprompt engineering strategies tailored to domain-specific workflows.My solutions embed AI into analytics, citizen-facing portals, andinternal knowledge bases for scalable, low-latency interaction.Alongside AI innovation, I bring deep expertise in modern softwarearchitecture. I lead the development of scalable, cloud-nativesystems using .NET Core, C#, Angular, TypeScript, and Azure(Functions, Web Apps, Cosmos DB, Key Vault). I’ve architectedmicroservices, secured API layers, and enterprise-grade CI/CDpipelines using GitHub Actions and Azure DevOps, supportingcomplex, data-intensive environments with high reliability andperformance.By aligning AI strategy with full-stack execution, I help organizationstransition from traditional digital systems to intelligent ecosystems,building platforms that are secure, adaptive, and future-ready.
+Experience
+Page 1 of 7
+Statistics Centre - Abu Dhabi
+Full Stack Engineer Lead
+November 2022 - Present (2 years 8 months)
+Abu Dhabi Emirate, United Arab Emirates
+As Full Stack Engineer Lead, I lead digital transformation and AI-driveninitiatives that enhance statistical services and enable intelligent datainteraction across the organization.• AI Integration: Deployed OpenAI GPT-4 and Azure OpenAI models forbuilding intelligent chatbots, automating knowledge workflows, and enablingnatural language data access.• LLM & NLP Solutions: Implemented Retrieval-Augmented Generation (RAG)pipelines using LangChain and Azure Cognitive Search for context-awarequerying and document summarization.• Cloud-Native Development: Designed and delivered scalable cloud solutionsusing Azure Resource Manager, Functions, and Web Apps.• Platform Modernization: Migrated legacy systems to .NET Coremicroservices and Angular frontends, improving performance andmaintainability.• Data Engineering: Developed optimized data access layers with SQL Server,MySQL, Entity Framework, and Dapper to support high-volume analytics.• Agile & CI/CD Leadership: Spearheaded agile delivery as a CertifiedScrumMaster and established end-to-end CI/CD pipelines for continuousintegration and secure deployments.• Security & Compliance: Led the development of secure document systemsaligned with stringent data governance and protection policies.• My role integrates AI innovation with cloud architecture and softwareengineering, delivering intelligent, efficient, and scalable digital solutions forthe public sector.Skills:OpenAI (GPT-4, GPT-3.5) · LangChain · Retrieval-Augmented Generation(RAG) · Azure OpenAI · Chatbot Development · NLP · Azure Functions · Azure
+Page 2 of 7
+Resource Manager · .NET Core · Angular · TypeScript · SQL Server · MySQL ·Entity Framework · Dapper · Azure Cognitive Search · CI/CD Pipelines · Scrum· DevOps · Cloud-Native Architecture · Secure Document Systems · AgileDelivery
+Ministry of Human Resources and Emiratisation
+Senior Lead Software Engineer
+July 2018 - April 2023 (4 years 10 months)
+Dubai, United Arab Emirates
+Project Overview.The Tasheel System is dedicated to government offices, providing automatedsolutions to facilitate expatriate processes. Our primary challenge wasmigrating the entire system from outdated legacy code to modern Web APIsand client-side frameworks, ensuring scalability, security, and performanceenhancements. This involved redesigning applications and addressingperformance bottlenecks across multiple areas. A significant portion of mywork was devoted to enhancing a secured document management system,ensuring the safe and secure handling of confidential documents.Responsibilities:• Played a crucial role in migrating the system from legacy code to Web APIs.• Actively participated in an agile environment, contributing to sprints and CI/CD pipelines.• Collaborated with the team to redesign applications, focusing on userexperience and performance.• Identified and addressed performance issues, enhancing overall efficiency.• Developed and maintained a secure document system, ensuringconfidentiality and integrity.Tools & Technologies:• Backend: .Net 5 / .Net Core, Microservices, Identity, Dapper, EntityFramework, MySQL, SQL Server.• Frontend: Angular (11, 12), TypeScript, RxJS, NGRX, NGXS, WebPack,Bazel, Gulp, NPM, Yarn.• Cloud Services: Azure, including web applications, cloud services, storage,backup, and recovery.• Agile Practices: Followed Agile and Scrum methodologies, participating inregular sprint activities.
+Page 3 of 7
+• CI/CD Pipelines: Implemented and maintained CI/CD pipelines for automatedcode deployments.Achievements:• Successfully migrated the entire legacy system to a modern tech stack,improving performance and scalability.• Enhanced user experience by redesigning key applications, leading toincreased user satisfaction.Implemented a secure document management system, safeguardingconfidential information.
+TRG - The Resource Group
+3 years 1 month
+Technical Team Lead
+July 2016 - June 2018 (2 years)
+Lahore, Pakistan
+Responsibilities:I have been leading a diverse team of Full Stack, IOS, and AndriodDevelopers, I have been involved in requirement gathering, Architecturedesigning, and development, Moreover following• Collaborating with various stakeholders to determine software requirements.• Creating high-level product specifications and design documents.• Providing the development team with architectural blueprints to follow.• Guiding and assisting the development team throughout the process.• Troubleshooting and resolving issues with coding or design.• Ensuring that you and the team adhere to development schedules anddeadlines.• Assist in the collection and documentation of user requirements, anddevelopment of user stories.• Presenting regular progress reports and setting goals.• Testing the final product to ensure it is completely functional and meetsrequirements.Tools & Technologies:• Angular, .Net Core, Asp.Net MVC, Asp.Net Web API,5, Identity Server, Entityframework• Ionic - Hybrid App development• JAVA Spring MVC, Hibernate ORM, REST API, JPA, Mappers
+Page 4 of 7
+• MongoDB, SQL Server, Oracle, MySql
+Senior Software Engineer
+June 2015 - June 2016 (1 year 1 month)
+Lahore, Pakistan
+Responsibilities:I have been working with Microsoft technologies and Mobile Hybrid Appdevelopment, Moreover following• Developing common components for the application (which can be used atthe organization level)• Performing internal architecture audit of software applications• Resolve implementation and integration issues with other developmentteams.• Coordinate with QA to ensure software quality and stable production release.• Project repositories and all level documentation Tools & Technologies:• Angular, .Net Core, Asp.Net MVC, Asp.Net Web API,5, Identity Server,Entity framework• Umbraco CMS• Ionic - Hybrid App development• JAVA Spring MVC, Hibernate ORM, REST API, JPA, Mappers• MongoDB, SQL Server, Oracle, MySql
+Nextbridge Ltd.
+Software Engineer
+November 2013 - June 2015 (1 year 8 months)
+Lahore, Pakistan
+Responsibilities:• Communication with the client for requirements understanding• Front End/Back End analysis and design.• Front End/Back End Developer.• Analysis and Estimates of Change Requests.• Developing common components for the application (which can be used atthe organization level)• Common Development tasks, Unit Testing, Deployment, Source code &release Management.Tools & Technologies:
+Page 5 of 7
+• ASP.NET, MVC4• Window Forms, WPF, Web Applications, Window Services• HTML, CSS3, Javascript, jQuery• MS SQL Server • Crystal Reports
+NetSol Technologies Inc.
+Software Engineer
+November 2012 - December 2013 (1 year 2 months)
+lahore
+Responsibilities:• Responsible for management of FIAT China & CNH Australia.• Involved in the optimization and maintenance of the Netsol Financial Suiteapplication.• Collaboration with the QA team and clients to timely diagnose and removefaults.• Front-end and back-end analysis and design• Enhancement and maintenance of previously developed modules in the CAP(Credit Application Processing) • Formulate specifications and develop applications of varying complexityincluding the modification of existing applications.• Release management of maintenance projects• Client communication to clear client understanding on reported fault andrequirement gatheringTools and Technologies:• C#.Net 1.1 and 3.5, ASP.Net 1.1 and 3.5, Visual Basic.Net 1.1 and 3.5• Web Services• Oracle 9i/10g • SQL Server 2000/2005/2008
+Education
+Shaheed Zulfikar Ali Bhutto Institute of Science and Technology
+Masters of Computer Sciences, Computer Science, Data Mining, DataScience · (2021 - 2023)
+The Islamia University of Bahawalpur
+Page 6 of 7
+BSCS, Computer Science · (2008 - 2012)
+Page 7 of 7
