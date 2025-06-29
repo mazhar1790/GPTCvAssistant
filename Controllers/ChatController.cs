@@ -42,7 +42,7 @@ namespace GPTCvAssistant.Controllers
             {
                 "Summarize Mazhar professional experience.",
                 "What are Mazhar strongest technical skills?",
-                "What types of roles best match Mazhar's background?",
+                "What types of roles best match Mazhar background?",
                 "List key projects Mazhar has worked on.",
                 "Describe Mazhar experience with AI or GPT technologies.",
                 "What leadership or team roles has Mazhar taken?",

@@ -36,8 +36,7 @@
 
         </div>
 
-     <div id="pinnedWrapper" class="chat-history mb-4">
-
+        <div id="pinnedWrapper" class="chat-history mb-4" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="text-muted mb-0">📌 Pinned Answers</h6>
                 @* <button class="btn btn-sm btn-outline-secondary" id="togglePinned">Toggle</button> *@
@@ -83,8 +82,8 @@
                 </div>
             }
         </div>
-        
-        
+
+
         @if (Model?.SuggestedPrompts?.Any() == true)
         {
             <div class="glass-effect mb-3 px-3 py-2" style="margin:28px">
@@ -99,7 +98,7 @@
 
         }
 
-        
+
 
         <div class="typing-indicator" id="typingIndicator">
             <i class="fas fa-robot me-2"></i>Activating knowledge module...
@@ -116,7 +115,11 @@
 
     </div>
 
+    <button id="scrollToBottom" class="btn btn-dark position-fixed" title="Scroll to bottom">
+        ⬇
+    </button>
     <!-- Toast notification -->
+
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
         <div id="toastAlert" class="toast align-items-center text-white bg-success border-0" role="alert">
             <div class="d-flex">
@@ -168,7 +171,7 @@
                         });
                 });
             }
-            
+
 
             async submitQuestion() {
                 const question = $('#userQuestion').val().trim();
@@ -293,7 +296,6 @@
             }
 
             addChatEntry(exchange) {
-                debugger;
                 const historyContainer = $('#chatHistory');
                 historyContainer.find('.text-center.text-muted').remove();
 
@@ -308,6 +310,7 @@
                     </div>
                 `;
                 historyContainer.append(entryHtml);
+                this.scrollToBottom();
             }
 
 
@@ -327,10 +330,14 @@
                 }
             }
 
-            scrollToBottom() {
-                const chatHistory = $('#chatHistory')[0];
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }
+               scrollToBottom() {
+                    const chatHistory = $('#chatHistory')[0];
+                    chatHistory.scrollTo({
+                        top: chatHistory.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+
 
             showAlert(message, type = 'info') {
                 const icons = {
@@ -437,6 +444,14 @@
             $('#searchWrapper').show();
          }
 
+         const chatHistory = $('#chatHistory');
+
+        chatHistory.on('scroll', function () {
+            const nearBottom = chatHistory[0].scrollTop + chatHistory[0].clientHeight >= chatHistory[0].scrollHeight - 100;
+            $('#scrollToBottom').toggle(!nearBottom);
+        });
+
+
         });
 
         function submitPrompt(prompt) {
@@ -449,12 +464,17 @@
             $('#userQuestion').val(question).focus();
             $('#submitBtn').click();
         });
-       
+
         let pinnedMap = new Map();
 
-        function loadPinned() {
+         function loadPinned() {
             const pinned = JSON.parse(localStorage.getItem('pinnedAnswers') || '[]');
-            if (pinned.length === 0) return;
+
+            // ✅ Fix: hide wrapper if there are no pins
+            if (pinned.length === 0) {
+                $('#pinnedWrapper').hide();  // this line fixes the issue
+                return;
+            }
 
             $('#pinnedWrapper').show();
             for (const entry of pinned) {
@@ -462,6 +482,8 @@
                 pinnedMap.set(entry.index, true);
             }
         }
+
+
 
         function savePinned() {
             const data = Array.from(pinnedMap.entries()).map(([index, html]) => html);
@@ -528,8 +550,24 @@
             });
         });
 
+        const chatHistory = $('#chatHistory');
+
+        chatHistory.on('scroll', function () {
+            const nearBottom = chatHistory[0].scrollTop + chatHistory[0].clientHeight >= chatHistory[0].scrollHeight - 100;
+            $('#scrollToBottom').toggle(!nearBottom);
+        });
+
+         $('#scrollToBottom').click(function () {
+            chatHistory[0].scrollTo({
+                top: chatHistory[0].scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+
+
 
 
     </script>
+
 </body>
 </html>

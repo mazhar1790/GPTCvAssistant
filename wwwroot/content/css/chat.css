@@ -945,15 +945,20 @@ body {
 #pinnedWrapper.collapsed .btn-unpin {
     display: none;
 }
-$(document).on('click', '.btn-copy-answer', function () {
-    const rawHtml = $(this).closest('.chat-entry').find('.response-html').html();
-    const plainText = $('<div>').html(rawHtml).text();
 
-    navigator.clipboard.writeText(plainText).then(() => {
-        const $btn = $(this);
-        $btn.text('✅ Copied!');
-        setTimeout(() => $btn.text('📋 Copy'), 1500);
-    }).catch(() => {
-        alert("Failed to copy text. Please try again.");
-    });
-});
+#scrollToBottom {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    display: none;
+    z-index: 999;
+    border-radius: 999px;
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem;
+    box-shadow: var(--shadow-md);
+}
+
+.chat-history {
+    max-height: 60vh;
+    overflow-y: auto;
+}
