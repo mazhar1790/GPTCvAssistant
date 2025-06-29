@@ -1,3 +1,4 @@
+﻿using Ganss.Xss;
 using GPTCvAssistant.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -5,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace GPTCvAssistant.Controllers
@@ -13,13 +15,23 @@ namespace GPTCvAssistant.Controllers
     {
         private readonly OpenAiService _openAi;
         private readonly GeminiService _geminiService;
+        private readonly HtmlSanitizer _sanitizer;
 
         public ChatController(OpenAiService openAi, GeminiService geminiService)
         {
             _openAi = openAi;
             _geminiService = geminiService;
 
-
+            _sanitizer = new HtmlSanitizer();
+            _sanitizer.AllowedTags.Add("h1");
+            _sanitizer.AllowedTags.Add("h2");
+            _sanitizer.AllowedTags.Add("h3");
+            _sanitizer.AllowedTags.Add("ul");
+            _sanitizer.AllowedTags.Add("li");
+            _sanitizer.AllowedTags.Add("strong");
+            _sanitizer.AllowedTags.Add("em");
+            _sanitizer.AllowedTags.Add("p");
+            _sanitizer.AllowedTags.Add("br");
         }
 
         [HttpGet]
@@ -44,13 +56,19 @@ namespace GPTCvAssistant.Controllers
 
                 var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>();
 
-                //var response = await _openRAi.AskAsync(request.UserQuestion);
-                var response = await _geminiService.AskAsync(request.UserQuestion);
+                var rawResponse = await _geminiService.AskAsync(request.UserQuestion);
+
+                // ⬇️ Remove triple backticks if accidentally added by Gemini
+                var cleanedRaw = StripMarkdownCodeBlock(rawResponse);
+
+                // ⬇️ Sanitize for safe rendering
+                var cleanHtml = _sanitizer.Sanitize(cleanedRaw);
+
 
                 var newExchange = new ChatExchange
                 {
                     UserQuestion = request.UserQuestion,
-                    Answer = response
+                    Answer = cleanHtml
                 };
 
                 history.Add(newExchange);
@@ -77,7 +95,7 @@ namespace GPTCvAssistant.Controllers
                 HttpContext.Session.Remove("ChatHistory");
                 return Json(new { success = true, message = "History cleared successfully" });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Failed to clear history" });
             }
@@ -104,14 +122,14 @@ namespace GPTCvAssistant.Controllers
                 foreach (var item in history)
                 {
                     sb.AppendLine($"You: {item.UserQuestion}");
-                    sb.AppendLine($"GPT: {item.Answer}");
+                    sb.AppendLine($"Assistant: {System.Text.RegularExpressions.Regex.Replace(item.Answer, "<.*?>", string.Empty)}");
                     sb.AppendLine();
                 }
 
                 var bytes = Encoding.UTF8.GetBytes(sb.ToString());
                 return File(bytes, "text/plain", "CV-GPT-Transcript.txt");
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Failed to generate transcript" });
             }
@@ -125,11 +143,18 @@ namespace GPTCvAssistant.Controllers
                 var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>();
                 return Json(new { success = true, history = history });
             }
-            catch (Exception ex)
+            catch
             {
                 return Json(new { success = false, message = "Failed to retrieve history" });
             }
         }
-    }
 
+        private string StripMarkdownCodeBlock(string input)
+        {
+            var regex = new Regex(@"^```(?:html)?\s*([\s\S]*?)\s*```$", RegexOptions.Multiline);
+            var match = regex.Match(input);
+            return match.Success ? match.Groups[1].Value.Trim() : input;
+        }
+
+    }
 }

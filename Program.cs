@@ -13,7 +13,7 @@ builder.Services.Configure<GPTCvAssistant.OpenAISettings>(
     builder.Configuration.GetSection("OpenAI"));
 
 builder.Services.AddSingleton<GPTCvAssistant.OpenAiService>();
-builder.Services.Configure<GeminiSettings>(
+builder.Services.Configure<GeminiService.GeminiSettings>(
     builder.Configuration.GetSection("Gemini"));
 
 builder.Services.AddSingleton<GeminiService>();

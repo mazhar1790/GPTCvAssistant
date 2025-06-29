@@ -19,8 +19,8 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            <h1><i class="fas fa-briefcase me-3"></i>Mazhar Hayat – AI-Powered Career Profile</h1>
-            <p class="text-muted">Ask anything about Mazhar Hayat’s experience, skills, and projects — delivered through an interactive AI assistant built for career insights..</p>
+            <h1><i class="fas fa-briefcase"></i>Mazhar Hayat – AI-Powered Career Profile</h1>
+            <p class="text-muted">Ask anything about Mazhar Hayat's experience, skills, and projects — delivered through an interactive AI assistant built for career insights.</p>
         </div>
 
         <!-- Alert container for messages -->
@@ -33,11 +33,12 @@
             <button id="downloadBtn" type="button" class="btn btn-outline-primary btn-sm">
                 <i class="fas fa-download me-2"></i>Download Transcript
             </button>
-        </div>
-        <div id="searchWrapper" class="px-4 mb-3 position-relative" style="display: none;">
-            <input id="searchBox" class="form-control" type="text" placeholder="🔍 Search past questions..." />
+
         </div>
 
+        <div id="searchWrapper" class="position-relative" style="display: none;">
+            <input id="searchBox" class="form-control" type="text" placeholder="🔍 Search past questions..." />
+        </div>
 
         <div id="chatHistory" class="chat-history">
             @if (Model?.History != null && Model.History.Any())
@@ -46,14 +47,15 @@
                 {
                     <div class="chat-entry">
                         <p><strong><i class="fas fa-user me-2"></i>You:</strong> @item.UserQuestion</p>
-                        <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong> @item.Answer</p>
+                        <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
+                        <div class="response-html">@Html.Raw(item.Answer)</div>
                     </div>
                 }
             }
             else
             {
-                <div class="text-center text-muted glass-effect" style="padding: 3rem; border-radius: 16px;">
-                    <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                <div class="text-center text-muted glass-effect">
+                    <i class="fas fa-comments mb-3" style="opacity: 0.3;"></i>
                     <p class="mb-0">No chat history yet. Ask your first question!</p>
                 </div>
             }
@@ -63,15 +65,14 @@
             <i class="fas fa-robot me-2"></i>Activating knowledge module...
         </div>
 
-        <div class="input-group">
-            <input type="text" id="userQuestion" class="form-control me-2" placeholder="Ask a question..." maxlength="500">
-            <button type="button" class="btn me-2" id="voiceBtn">
-                <i class="fas fa-microphone"></i>
-            </button>
-            <button type="button" id="submitBtn" class="btn btn-submit">
-                <i class="fas fa-paper-plane me-2"></i>Ask
-            </button>
+        <div class="input-group w-100 flex-wrap">
+            <input type="text" id="userQuestion" class="form-control" placeholder="Ask a question..." maxlength="500">
+            <button type="button" class="btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
+            <button type="button" id="submitBtn" class="btn btn-submit"><i class="fas fa-paper-plane me-2"></i>Ask</button>
         </div>
+
+
+
     </div>
 
     <!-- Toast notification -->
@@ -256,12 +257,14 @@
                 // Remove "no history" message if it exists
                 historyContainer.find('.text-center.text-muted').remove();
 
-                const entryHtml = `
-                    <div class="chat-entry">
-                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
-                        <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong> ${this.escapeHtml(exchange.answer)}</p>
-                    </div>
-                `;
+                        const entryHtml = `
+                        <div class="chat-entry">
+                            <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
+                            <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
+                            <div class="response-html">${exchange.answer}</div>
+                        </div>
+                     `;
+
 
                 historyContainer.append(entryHtml);
             }
@@ -371,7 +374,16 @@
 
          if ($('.chat-entry').length >= 9) {
             $('#searchWrapper').show();
-        }
+         }
+
+         if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+            $('#voiceBtn').hide(); // or $('#voiceBtn').addClass('d-none');
+         }
+
+         if ($('.chat-entry').length >= 9) {
+            $('#searchWrapper').show();
+         }
+
         });
     </script>
 </body>

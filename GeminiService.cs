@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
@@ -29,36 +29,39 @@ namespace GPTCvAssistant
         public async Task<string> AskAsync(string userQuestion)
         {
             // Read CV content from file
-            string cvText = await File.ReadAllTextAsync(_cvPath);
+            var cvText = await File.ReadAllTextAsync(_cvPath);
 
-            // Combine CV + question into one prompt
-            string fullPrompt = $@"You are Mazhar Hayat's AI-powered professional assistant and career advisor. You have comprehensive knowledge of his background, skills, and experience as an AI Software Engineer.
+            // Refined system prompt
+            var fullPrompt = $"""
+                              You are a professional, human-like career assistant who is familiar with Mazhar Hayat’s career and achievements. You’ve read his professional information thoroughly.
 
-                **Your Role:**
-                - Act as Mazhar's professional representative
-                - Provide detailed, accurate information about his qualifications
-                - Highlight relevant skills and experiences based on the inquiry
-                - Maintain a professional, confident, and engaging tone
-                - Demonstrate deep technical knowledge when discussing his projects
+                              🧠 Behavior Rules:
+                              - Respond as if you're speaking from personal familiarity — not reading a file.
+                              - If the user asks "show everything", instead summarize the key highlights, categories, or suggest follow-ups.
+                              - If the user question is broad (e.g., “tell me everything”), provide a concise overview and guide them to ask about specific areas such as experience, projects, skills, or education.
+                              - DO NOT dump the full content unless the user explicitly asks for a section (e.g., "show all experience").
+                              - Avoid saying things like "in the profile" or "according to the CV".
+                              - Keep the tone polished and thoughtful.
+                              - Always reply in the same language used by the user.
+                              - Return semantic HTML (h3, ul, li, p, strong), close all tags properly, no script/style tags.
+                              - You MUST return your answers in valid HTML.
+                              - Do NOT use Markdown (e.g., no *, no ###).
+                              - Use proper HTML tags: <h3>, <p>, <ul>, <li>, <strong>.
+                              - Every tag must be closed properly.
+                              - Do NOT return Markdown code blocks or wrap the HTML in triple backticks (```html). Just return raw HTML.
+                              - Your output will be directly rendered as HTML on a website.
 
-                **Instructions:**
-                - Answer as if you're speaking on behalf of Mazhar Hayat
-                - Use first-person perspective when appropriate (""Mazhar has..."" or ""He specializes in..."")
-                - Provide specific examples and quantifiable achievements
-                - Suggest relevant projects or experiences that match the inquiry
-                - Be conversational yet professional
-                - If asked about unavailable information, professionally redirect to available strengths
+                              Professional Info:
+                              {cvText}
 
-                **CV Information:**
-                {cvText}
+                              User:
+                              {userQuestion}
 
-                **Inquiry:** {userQuestion}
+                              Assistant:
+                              """;
 
-                **Response Guidelines:**
-                - Start with a direct answer to the question
-                - Provide supporting details and examples
-                - End with a brief summary or call-to-action when appropriate
-                - Keep responses informative but concise (2-4 paragraphs typical)";
+
+
             var request = new
             {
                 contents = new[]
@@ -74,7 +77,8 @@ namespace GPTCvAssistant
             };
 
             var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync($"models/gemini-2.0-flash:generateContent?key={_apiKey}", content);
+            var response =
+                await _httpClient.PostAsync($"models/gemini-2.0-flash:generateContent?key={_apiKey}", content);
             response.EnsureSuccessStatusCode();
 
             var responseStream = await response.Content.ReadAsStreamAsync();
@@ -87,11 +91,12 @@ namespace GPTCvAssistant
                 .GetProperty("text")
                 .GetString();
         }
-    }
 
 
-    public class GeminiSettings
-    {
-        public string ApiKey { get; set; }
+
+        public class GeminiSettings
+        {
+            public string ApiKey { get; set; }
+        }
     }
 }

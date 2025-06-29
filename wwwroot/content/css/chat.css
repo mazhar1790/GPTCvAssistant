@@ -1,6 +1,4 @@
-﻿/* Professional AI Software Engineer Chat Styles */
-
-:root {
+﻿:root {
     --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     --secondary-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
     --accent-gradient: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
@@ -31,9 +29,10 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    padding: clamp(0.5rem, 2vw, 1.25rem);
     color: var(--text-primary);
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 .chat-container {
@@ -41,57 +40,68 @@ body {
     margin: 0 auto;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: clamp(8px, 2vw, 12px);
     box-shadow: var(--shadow-xl);
     overflow: hidden;
     transition: all 0.3s ease;
+    min-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-header {
     text-align: center;
-    padding: 2.5rem 2rem 2rem;
+    padding: clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) clamp(1rem, 3vw, 2rem);
     background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
 }
 
     .chat-header h1 {
-        font-size: 1.875rem;
+        font-size: clamp(1.25rem, 4vw, 1.875rem);
         font-weight: 700;
         color: var(--text-primary);
         margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.75rem;
+        flex-wrap: wrap;
+        gap: clamp(0.5rem, 2vw, 0.75rem);
+        line-height: 1.2;
     }
 
         .chat-header h1 i {
             color: #3b82f6;
+            font-size: clamp(1rem, 3vw, 1.5rem);
         }
 
     .chat-header p {
-        font-size: 1rem;
+        font-size: clamp(0.875rem, 2.5vw, 1rem);
         color: var(--text-secondary);
         margin: 0;
         max-width: 600px;
         margin: 0 auto;
+        line-height: 1.5;
     }
 
 #themeToggle {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
+    top: clamp(0.5rem, 2vw, 1.25rem);
+    right: clamp(0.5rem, 2vw, 1.25rem);
+    width: clamp(40px, 8vw, 50px);
+    height: clamp(40px, 8vw, 50px);
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: clamp(1rem, 3vw, 1.25rem);
     box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
     z-index: 1000;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
     #themeToggle:hover {
@@ -102,23 +112,29 @@ body {
 
 .action-bar {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding: 1.5rem 2rem;
+    justify-content: center;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+    padding: clamp(1rem, 3vw, 1.5rem) clamp(1rem, 4vw, 2rem);
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
     .action-bar .btn {
         border-radius: 6px;
-        padding: 0.5rem 1rem;
+        padding: clamp(0.5rem, 2vw, 0.5rem) clamp(0.75rem, 3vw, 1rem);
         font-weight: 500;
-        font-size: 0.875rem;
+        font-size: clamp(0.75rem, 2vw, 0.875rem);
         transition: all 0.3s ease;
         border: 1px solid var(--border-color);
         background: var(--bg-primary);
-        color: var(--text-primary);
+        /*color: var(--text-primary);*/
         cursor: pointer;
+        flex: 1;
+        min-width: 120px;
+        max-width: 200px;
+        white-space: nowrap;
     }
 
         .action-bar .btn:hover {
@@ -129,19 +145,19 @@ body {
 .btn-outline-danger {
     color: #dc2626;
     border-color: #fecaca;
-    background: #fef2f2;
+    background-color: transparent; /* ✅ outlined by default */
 }
 
     .btn-outline-danger:hover {
-        background: var(--danger-gradient);
-        color: white;
-        border-color: transparent;
+        background-color: #fee2e2; /* Light red */
+        border-color: #fca5a5;
+        color: #b91c1c;
     }
 
 .btn-outline-primary {
     color: #2563eb;
     border-color: #dbeafe;
-    background: #eff6ff;
+    background-color: transparent; /* ✅ outlined by default */
 }
 
     .btn-outline-primary:hover {
@@ -151,17 +167,19 @@ body {
     }
 
 #searchWrapper {
-    padding: 0 2rem 1rem;
+    padding: 0 clamp(1rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem);
     background: var(--bg-secondary);
+    flex-shrink: 0;
 }
 
 #searchBox {
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
+    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
+    font-size: clamp(0.875rem, 2vw, 0.875rem);
     background: var(--bg-primary);
     transition: all 0.3s ease;
+    width: 100%;
 }
 
     #searchBox:focus {
@@ -171,12 +189,13 @@ body {
     }
 
 .chat-history {
-    max-height: 500px;
+    flex: 1;
     overflow-y: auto;
-    padding: 1.5rem 2rem;
+    padding: clamp(1rem, 3vw, 1.5rem) clamp(1rem, 4vw, 2rem);
     background: var(--bg-primary);
     scrollbar-width: thin;
     scrollbar-color: var(--border-color) transparent;
+    min-height: 200px;
 }
 
     .chat-history::-webkit-scrollbar {
@@ -200,11 +219,13 @@ body {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    margin-bottom: clamp(0.75rem, 2vw, 1rem);
     box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
     .chat-entry::before {
@@ -226,10 +247,11 @@ body {
     .chat-entry p {
         margin: 0;
         line-height: 1.6;
+        font-size: clamp(0.875rem, 2vw, 1rem);
     }
 
         .chat-entry p:not(:last-child) {
-            margin-bottom: 1rem;
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
         }
 
     .chat-entry strong {
@@ -249,26 +271,56 @@ body {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
     border-radius: 8px;
+    padding: clamp(2rem, 5vw, 3rem);
 }
 
+    .glass-effect i {
+        font-size: clamp(2rem, 6vw, 3rem);
+    }
+
 .input-group {
-    padding: 2rem;
+    padding: clamp(1rem, 3vw, 2rem);
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
     display: flex;
-    gap: 0.75rem;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: stretch;
 }
+
+    .input-group .form-control {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .input-group .btn,
+    .input-group #voiceBtn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+@media (max-width: 576px) {
+    .input-group {
+        flex-direction: column;
+    }
+
+        .input-group .form-control,
+        .input-group .btn,
+        .input-group #voiceBtn {
+            width: 100%;
+        }
+}
+
 
 .form-control {
     flex: 1;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+    padding: clamp(0.75rem, 2vw, 0.75rem) clamp(0.75rem, 3vw, 1rem);
+    font-size: clamp(0.875rem, 2vw, 1rem);
     background: var(--bg-primary);
     color: var(--text-primary);
     transition: all 0.3s ease;
+    min-height: 48px;
 }
 
     .form-control:focus {
@@ -284,17 +336,22 @@ body {
 .btn-submit, #voiceBtn {
     border: none;
     border-radius: 6px;
-    padding: 0.75rem 1.5rem;
+    padding: clamp(0.75rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
     font-weight: 600;
     transition: all 0.3s ease;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: clamp(0.875rem, 2vw, 0.875rem);
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .btn-submit {
     background: var(--primary-gradient);
     color: white;
-    min-width: 100px;
+    min-width: clamp(80px, 15vw, 100px);
 }
 
     .btn-submit:hover {
@@ -311,12 +368,8 @@ body {
 #voiceBtn {
     background: var(--secondary-gradient);
     color: white;
-    padding: 0.75rem;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: clamp(48px, 10vw, 48px);
+    padding: 0;
 }
 
     #voiceBtn:hover {
@@ -326,13 +379,15 @@ body {
 
 .typing-indicator {
     display: none;
-    padding: 1rem 2rem;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 4vw, 2rem);
     font-style: italic;
     color: var(--text-secondary);
     text-align: center;
     background: var(--bg-tertiary);
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    flex-shrink: 0;
 }
 
     .typing-indicator::after {
@@ -352,12 +407,22 @@ body {
     }
 }
 
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
 .alert {
     border: none;
     border-radius: 6px;
-    margin: 0 2rem 1rem;
-    padding: 1rem;
-    font-size: 0.875rem;
+    margin: 0 clamp(1rem, 4vw, 2rem) clamp(0.5rem, 2vw, 1rem);
+    padding: clamp(0.75rem, 2vw, 1rem);
+    font-size: clamp(0.875rem, 2vw, 0.875rem);
 }
 
 .alert-success {
@@ -436,11 +501,17 @@ body {
         border-color: var(--border-color);
     }
 
-    .dark-mode .glass-effect {
-        background: var(--bg-tertiary);
-        border-color: var(--border-color);
+    .dark-mode .glass-effect p,
+    .dark-mode .glass-effect i {
+        color: var(--text-secondary);
     }
-
+    .dark-mode .glass-effect i {
+        color: #94a3b8; /* or #cbd5e1 depending on your palette */
+        opacity: 0.6;
+    }
+.glass-effect i {
+    transition: color 0.3s ease;
+}
     .dark-mode #themeToggle {
         background: var(--bg-secondary);
         border-color: var(--border-color);
@@ -477,77 +548,75 @@ body {
         color: var(--text-primary);
     }
 
-/* Loading animation */
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* Responsive design */
+/* Enhanced Mobile Responsive Design */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 0.5rem;
     }
 
     .chat-container {
-        margin: 0;
         border-radius: 8px;
-        min-height: calc(100vh - 20px);
+        min-height: calc(100vh - 1rem);
     }
 
-    .chat-header {
-        padding: 2rem 1rem 1.5rem;
-    }
-
-        .chat-header h1 {
-            font-size: 1.5rem;
-        }
-
-    .action-bar {
-        padding: 1rem;
+    .chat-header h1 {
         flex-direction: column;
         gap: 0.5rem;
     }
 
-    .chat-history {
-        padding: 1rem;
+    .action-bar {
+        flex-direction: column;
+        gap: 0.5rem;
     }
+
+        .action-bar .btn {
+            max-width: none;
+            flex: none;
+        }
 
     .input-group {
-        padding: 1rem;
         flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
-    #themeToggle {
-        width: 44px;
-        height: 44px;
-        font-size: 1rem;
+    .form-control {
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
 
-    .btn-submit {
-        min-width: 80px;
-        padding: 0.75rem 1rem;
+    .btn-submit, #voiceBtn {
+        flex: 1;
+        min-width: 0;
     }
 
     #voiceBtn {
-        width: 44px;
-        height: 44px;
+        width: auto;
+    }
+
+    .chat-history {
+        max-height: calc(100vh - 400px);
     }
 }
 
 @media (max-width: 480px) {
     body {
-        padding: 5px;
+        padding: 0.25rem;
     }
 
-    .chat-header h1 {
-        font-size: 1.25rem;
-        flex-direction: column;
-        gap: 0.5rem;
+    .chat-container {
+        min-height: calc(100vh - 0.5rem);
     }
+
+    .chat-header {
+        padding: 1rem 0.75rem;
+    }
+
+        .chat-header h1 {
+            font-size: 1.125rem;
+        }
 
     .chat-entry {
-        padding: 1rem;
+        padding: 0.75rem;
     }
 
     .input-group {
@@ -556,22 +625,77 @@ body {
     }
 
     .form-control {
-        margin: 0;
+        margin-bottom: 0;
     }
 
     .btn-submit, #voiceBtn {
         width: 100%;
-        margin: 0;
-    }
-
-    #voiceBtn {
-        width: 100%;
-        height: auto;
-        padding: 0.75rem;
+        height: 48px;
     }
 
     .action-bar {
-        flex-direction: column;
+        padding: 0.75rem;
+    }
+
+    .chat-history {
+        padding: 0.75rem;
+    }
+
+    #searchWrapper {
+        padding: 0 0.75rem 0.75rem;
+    }
+
+    .typing-indicator {
+        padding: 0.75rem;
+    }
+
+    .alert {
+        margin: 0 0.75rem 0.75rem;
+    }
+}
+
+/* Ultra-small devices */
+@media (max-width: 320px) {
+    .chat-header h1 {
+        font-size: 1rem;
+    }
+
+    .chat-header p {
+        font-size: 0.8rem;
+    }
+
+    .chat-entry p {
+        font-size: 0.8rem;
+    }
+
+    .btn-submit, #voiceBtn {
+        font-size: 0.8rem;
+        padding: 0.6rem;
+    }
+}
+
+/* Landscape orientation on small devices */
+@media (max-height: 500px) and (orientation: landscape) {
+    .chat-header {
+        padding: 0.75rem;
+    }
+
+        .chat-header h1 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-header p {
+            font-size: 0.875rem;
+        }
+
+    .chat-history {
+        max-height: calc(100vh - 200px);
+    }
+
+    .action-bar {
+        flex-direction: row;
+        padding: 0.75rem;
     }
 }
 
@@ -583,11 +707,53 @@ body {
 }
 
 /* Smooth transitions */
-* {
-    transition: all 0.2s ease;
-}
-
 .chat-entry[style*="display: none"] {
     opacity: 0;
     pointer-events: none;
+}
+
+/* Loading animation */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Particle effect for larger screens */
+@media (min-width: 768px) {
+    .particle {
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+    }
+}
+.response-html {
+    margin-top: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.response-html h3 {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+}
+
+.response-html ul {
+    padding-left: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.response-html li {
+    margin-bottom: 0.25rem;
+    line-height: 1.6;
+}
+.dark-mode .chat-header p {
+    color: #cbd5e1 !important;
 }
