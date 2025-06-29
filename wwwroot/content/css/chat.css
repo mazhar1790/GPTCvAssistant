@@ -757,3 +757,25 @@ body {
 .dark-mode .chat-header p {
     color: #cbd5e1 !important;
 }
+.suggestion-scroll {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+    .suggestion-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .suggestion-scroll::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 4px;
+    }
+    .suggestion-scroll .btn {
+        border-radius: 999px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }

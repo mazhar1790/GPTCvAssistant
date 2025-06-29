@@ -60,6 +60,23 @@
                 </div>
             }
         </div>
+        
+        
+        @if (Model?.SuggestedPrompts?.Any() == true)
+        {
+            <div class="glass-effect mb-3 px-3 py-2" style="margin:28px">
+                <p class="mb-2 text-muted fw-semibold small">Suggested questions:</p>
+                <div class="suggestion-scroll px-1">
+                    @foreach (var prompt in Model.SuggestedPrompts)
+                    {
+                        <button class="btn btn-outline-primary btn-sm me-2 mb-1" onclick="submitPrompt('@prompt')">@prompt</button>
+                    }
+                </div>
+            </div>
+
+        }
+
+        
 
         <div class="typing-indicator" id="typingIndicator">
             <i class="fas fa-robot me-2"></i>Activating knowledge module...
@@ -385,6 +402,12 @@
          }
 
         });
+
+        function submitPrompt(prompt) {
+           $('#userQuestion').val(prompt).focus();
+           $('#submitBtn').click();
+        }
+
     </script>
 </body>
 </html>

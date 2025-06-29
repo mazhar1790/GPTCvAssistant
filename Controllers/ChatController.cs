@@ -37,8 +37,20 @@ namespace GPTCvAssistant.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+
+            var suggestions = new List<string>
+            {
+                "What are my strongest skills?",
+                "Which job roles suit my experience?",
+                "How can I improve my CV?",
+                "Summarize my education background.",
+                "What are potential weaknesses in my resume?"
+            };
+
+
             var model = new ChatModel
             {
+                SuggestedPrompts = suggestions,
                 History = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>()
             };
             return View("Index", model);

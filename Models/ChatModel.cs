@@ -6,6 +6,8 @@ namespace GPTCvAssistant.Models
     {
         public string UserQuestion { get; set; }
         public List<ChatExchange> History { get; set; } = new();
+        public List<string> SuggestedPrompts { get; set; } = new();
+
     }
 
     public class ChatExchange
