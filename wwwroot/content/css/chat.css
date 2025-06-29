@@ -962,3 +962,25 @@ body {
     max-height: 60vh;
     overflow-y: auto;
 }
+.profile-card {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.hover-profile {
+    cursor: pointer;
+    border-bottom: 1px dashed var(--text-muted);
+}
+.profile-card .btn {
+    flex: 1;
+    font-size: 0.85rem;
+    justify-content: center;
+}
