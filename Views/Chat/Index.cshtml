@@ -36,6 +36,16 @@
 
         </div>
 
+     <div id="pinnedWrapper" class="chat-history mb-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="text-muted mb-0">📌 Pinned Answers</h6>
+                @* <button class="btn btn-sm btn-outline-secondary" id="togglePinned">Toggle</button> *@
+            </div>
+            <div id="pinnedAnswers" class="pinned-container"></div>
+        </div>
+
+
         <div id="searchWrapper" class="position-relative" style="display: none;">
             <input id="searchBox" class="form-control" type="text" placeholder="🔍 Search past questions..." />
         </div>
@@ -49,6 +59,19 @@
                         <p><strong><i class="fas fa-user me-2"></i>You:</strong> @item.UserQuestion</p>
                         <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
                         <div class="response-html">@Html.Raw(item.Answer)</div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-sm btn-outline-secondary btn-ask-again" data-question="@item.UserQuestion">
+                                🔁
+                            </button>
+
+                            <button class="btn btn-sm btn-outline-success btn-pin-answer" style="margin-right:5px" data-index="@Model.History.IndexOf(item)">
+                                📌
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary btn-copy-answer">
+                                📋
+                            </button>
+                        </div>
+
                     </div>
                 }
             }
@@ -84,6 +107,7 @@
 
         <div class="input-group w-100 flex-wrap">
             <input type="text" id="userQuestion" class="form-control" placeholder="Ask a question..." maxlength="500">
+            <div id="smartSuggestions" class="dropdown-menu show mt-1" style="display: none;"></div>
             <button type="button" class="btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
             <button type="button" id="submitBtn" class="btn btn-submit"><i class="fas fa-paper-plane me-2"></i>Ask</button>
         </div>
@@ -269,22 +293,23 @@
             }
 
             addChatEntry(exchange) {
+                debugger;
                 const historyContainer = $('#chatHistory');
-
-                // Remove "no history" message if it exists
                 historyContainer.find('.text-center.text-muted').remove();
 
-                        const entryHtml = `
-                        <div class="chat-entry">
-                            <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
-                            <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
-                            <div class="response-html">${exchange.answer}</div>
-                        </div>
-                     `;
+                const tone = this.getTone(exchange.answer);
+                const toneClass = '' /* tone ? `tone-${tone}` : ''; */
 
-
+                const entryHtml = `
+                    <div class="chat-entry ${toneClass}">
+                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
+                        <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
+                        <div class="response-html">${exchange.answer}</div>
+                    </div>
+                `;
                 historyContainer.append(entryHtml);
             }
+
 
             setLoading(isLoading) {
                 const submitBtn = $('#submitBtn');
@@ -383,11 +408,22 @@
                 div.textContent = text;
                 return div.innerHTML;
             }
+            getTone(text) {
+                text = 'be careful';
+                const lower = text.toLowerCase();
+                if (/(great job|well done|impressive|amazing|excellent)/.test(lower)) return 'success';
+                if (/(warning|note:|caution|be careful)/.test(lower)) return 'warning';
+                if (/(suggest|recommend|tip|advice|consider)/.test(lower)) return 'info';
+                if (/(sorry|cannot|failed|error|unfortunately)/.test(lower)) return 'danger';
+                return null;
+            }
+
         }
 
         // Initialize the app when the page loads
         $(document).ready(() => {
             new ChatApp();
+            loadPinned();
 
          if ($('.chat-entry').length >= 9) {
             $('#searchWrapper').show();
@@ -407,6 +443,92 @@
            $('#userQuestion').val(prompt).focus();
            $('#submitBtn').click();
         }
+
+        $(document).on('click', '.btn-ask-again', function () {
+            const question = $(this).data('question');
+            $('#userQuestion').val(question).focus();
+            $('#submitBtn').click();
+        });
+       
+        let pinnedMap = new Map();
+
+        function loadPinned() {
+            const pinned = JSON.parse(localStorage.getItem('pinnedAnswers') || '[]');
+            if (pinned.length === 0) return;
+
+            $('#pinnedWrapper').show();
+            for (const entry of pinned) {
+                renderPinned(entry.index, entry.question, entry.answer);
+                pinnedMap.set(entry.index, true);
+            }
+        }
+
+        function savePinned() {
+            const data = Array.from(pinnedMap.entries()).map(([index, html]) => html);
+            localStorage.setItem('pinnedAnswers', JSON.stringify(data));
+        }
+
+        function renderPinned(index, question, answer) {
+            const html = `
+                <div class="chat-entry" data-index="${index}">
+                    <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${$('<div>').text(question).html()}</p>
+                    <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
+                    <div class="response-html">${answer}</div>
+                    <div class="d-flex justify-content-end mt-2">
+                        <button class="btn btn-sm btn-outline-danger btn-unpin" data-index="${index}">❌ Unpin</button>
+                    </div>
+                </div>
+            `;
+            $('#pinnedAnswers').append(html);
+        }
+
+        $(document).on('click', '.btn-pin-answer', function () {
+            const $btn = $(this);
+            const entry = $btn.closest('.chat-entry');
+            const index = $btn.data('index');
+            const question = entry.find('p').eq(0).text().replace("You:", "").trim();
+            const answer = entry.find('.response-html').html();
+
+            if (pinnedMap.has(index)) return;
+
+            pinnedMap.set(index, { index, question, answer });
+            savePinned();
+            renderPinned(index, question, answer);
+            $('#pinnedWrapper').show();
+            $btn.text('📌 Pinned').addClass('disabled');
+        });
+
+        $(document).on('click', '.btn-unpin', function () {
+            const index = $(this).data('index');
+            pinnedMap.delete(index);
+            savePinned();
+            $(`.chat-entry[data-index="${index}"]`).remove();
+            if ($('#pinnedAnswers .chat-entry').length === 0) {
+                $('#pinnedWrapper').hide();
+            }
+        });
+
+         $('#togglePinned').click(function () {
+            $('#pinnedWrapper').toggleClass('collapsed');
+
+            const isCollapsed = $('#pinnedWrapper').hasClass('collapsed');
+            $(this).text(isCollapsed ? 'Show' : 'Hide');
+        });
+
+         $(document).on('click', '.btn-copy-answer', function () {
+            const rawHtml = $(this).closest('.chat-entry').find('.response-html').html();
+            const plainText = $('<div>').html(rawHtml).text();
+
+            navigator.clipboard.writeText(plainText).then(() => {
+                const $btn = $(this);
+                $btn.text('✅ Copied!');
+                setTimeout(() => $btn.text('📋 Copy'), 1500);
+            }).catch(() => {
+                alert("Failed to copy text. Please try again.");
+            });
+        });
+
+
 
     </script>
 </body>
