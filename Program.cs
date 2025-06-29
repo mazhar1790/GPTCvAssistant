@@ -1,4 +1,5 @@
 
+using GPTCvAssistant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -11,7 +12,12 @@ builder.Services.AddControllersWithViews()
 builder.Services.Configure<GPTCvAssistant.OpenAISettings>(
     builder.Configuration.GetSection("OpenAI"));
 
-builder.Services.AddSingleton<GPTCvAssistant.OpenAIService>();
+builder.Services.AddSingleton<GPTCvAssistant.OpenAiService>();
+builder.Services.Configure<GeminiSettings>(
+    builder.Configuration.GetSection("Gemini"));
+
+builder.Services.AddSingleton<GeminiService>();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 

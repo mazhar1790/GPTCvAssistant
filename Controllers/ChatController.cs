@@ -11,11 +11,15 @@ namespace GPTCvAssistant.Controllers
 {
     public class ChatController : Controller
     {
-        private readonly OpenAIService _openAi;
+        private readonly OpenAiService _openAi;
+        private readonly GeminiService _geminiService;
 
-        public ChatController(OpenAIService openAi)
+        public ChatController(OpenAiService openAi, GeminiService geminiService)
         {
             _openAi = openAi;
+            _geminiService = geminiService;
+
+
         }
 
         [HttpGet]
@@ -40,7 +44,8 @@ namespace GPTCvAssistant.Controllers
 
                 var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>();
 
-                var response = await _openAi.AskQuestionAsync(request.UserQuestion);
+                //var response = await _openRAi.AskAsync(request.UserQuestion);
+                var response = await _geminiService.AskAsync(request.UserQuestion);
 
                 var newExchange = new ChatExchange
                 {
@@ -60,7 +65,7 @@ namespace GPTCvAssistant.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "An error occurred while processing your request" });
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
