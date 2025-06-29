@@ -40,13 +40,17 @@ namespace GPTCvAssistant.Controllers
 
             var suggestions = new List<string>
             {
-                "What are my strongest skills?",
-                "Which job roles suit my experience?",
-                "How can I improve my CV?",
-                "Summarize my education background.",
-                "What are potential weaknesses in my resume?"
+                "Summarize Mazhar professional experience.",
+                "What are Mazhar strongest technical skills?",
+                "What types of roles best match Mazhar's background?",
+                "List key projects Mazhar has worked on.",
+                "Describe Mazhar experience with AI or GPT technologies.",
+                "What leadership or team roles has Mazhar taken?",
+                "How is Mazhar experienced in software architecture?",
+                "Highlight Mazhar full stack development experience.",
+                "What industries has Mazhar worked in?",
+                "Give a quick overview of Mazhar's career."
             };
-
 
             var model = new ChatModel
             {
