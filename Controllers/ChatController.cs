@@ -73,7 +73,8 @@ namespace GPTCvAssistant.Controllers
                 var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>();
 
                 var rawResponse = await _geminiService.AskAsync(request.UserQuestion);
-
+                //var rawResponse = await _openAi.AskQuestionAsync(request.UserQuestion);
+                
                 // ⬇️ Remove triple backticks if accidentally added by Gemini
                 var cleanedRaw = StripMarkdownCodeBlock(rawResponse);
 

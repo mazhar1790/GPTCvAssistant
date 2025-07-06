@@ -1,4 +1,3 @@
-
 using GPTCvAssistant;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,10 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
-builder.Services.Configure<GPTCvAssistant.OpenAISettings>(
+// Add HttpClient service
+builder.Services.AddHttpClient();
+
+builder.Services.Configure<OpenAISettings>(
     builder.Configuration.GetSection("OpenAI"));
 
-builder.Services.AddSingleton<GPTCvAssistant.OpenAiService>();
+builder.Services.AddSingleton<OpenAiService>();
 builder.Services.Configure<GeminiService.GeminiSettings>(
     builder.Configuration.GetSection("Gemini"));
 
