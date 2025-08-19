@@ -1,8 +1,8 @@
-# AI-Powered Career Profile Assistant
+﻿# AI-Powered Career Profile Assistant
 
 An innovative, interactive CV platform that transforms traditional resume presentation into an engaging AI-driven conversation experience. Built for modern recruitment, this application allows recruiters and employers to explore candidate information through natural language interactions.
 
-## ?? Features
+## 🚀 Features
 
 ### Core Capabilities
 - **Interactive Chat Interface**: Natural conversation with AI about candidate experience
@@ -23,9 +23,10 @@ An innovative, interactive CV platform that transforms traditional resume presen
 - **Search & Filter**: History search and content filtering
 - **Theme Support**: Light/dark mode toggle
 
-## ?? Technology Stack
+## 🛠 Technology Stack
 
 - **Backend**: ASP.NET Core 7.0 (C#)
+- 
 - **Frontend**: Razor Pages, Bootstrap 5, jQuery
 - **AI Services**: OpenAI GPT-4, Google Gemini
 - **Session Storage**: In-memory caching
@@ -33,24 +34,24 @@ An innovative, interactive CV platform that transforms traditional resume presen
 - **Styling**: CSS3 with custom animations
 - **Icons**: Font Awesome 6
 
-## ?? Project Structure
+## 📁 Project Structure
 
 ```
 GPTCvAssistant/
-??? Configuration/          # Settings and configuration classes
-??? Constants/             # Application constants and enums
-??? Controllers/           # MVC controllers
-??? Extensions/            # Extension methods
-??? Middleware/            # Custom middleware
-??? Models/               # Data models and DTOs
-??? Services/             # Business logic and AI services
-?   ??? Interfaces/       # Service contracts
-?   ??? Implementation/   # Service implementations
-??? Views/                # Razor views and templates
-??? wwwroot/             # Static files (CSS, JS, images)
+├── Configuration/          # Settings and configuration classes
+├── Constants/             # Application constants and enums
+├── Controllers/           # MVC controllers
+├── Extensions/            # Extension methods
+├── Middleware/            # Custom middleware
+├── Models/               # Data models and DTOs
+├── Services/             # Business logic and AI services
+│   ├── Interfaces/       # Service contracts
+│   └── Implementation/   # Service implementations
+├── Views/                # Razor views and templates
+└── wwwroot/             # Static files (CSS, JS, images)
 ```
 
-## ?? Configuration
+## ⚙️ Configuration
 
 ### Required API Keys
 
@@ -83,7 +84,7 @@ Place the candidate's CV content in:
 App_Data/ExtractedCV.txt
 ```
 
-## ????? Getting Started
+## 🏃‍♂️ Getting Started
 
 ### Prerequisites
 - .NET 7.0 SDK or later
@@ -114,7 +115,7 @@ App_Data/ExtractedCV.txt
 
 6. **Open browser** and navigate to `https://localhost:7000`
 
-## ?? Usage Examples
+## 💡 Usage Examples
 
 ### For Recruiters
 - Ask about specific technical skills: *"What's Mazhar's experience with Azure?"*
@@ -132,7 +133,7 @@ App_Data/ExtractedCV.txt
 - Get AI-generated questions for specific roles
 - Practice responses with instant feedback
 
-## ?? Architecture Highlights
+## 🔧 Architecture Highlights
 
 ### Dependency Injection
 - Clean separation of concerns
@@ -154,7 +155,7 @@ App_Data/ExtractedCV.txt
 - HTTP client factory for API calls
 - Session-based caching for chat history
 
-## ?? Deployment
+## 🚀 Deployment
 
 ### Development
 ```bash
@@ -177,7 +178,7 @@ EXPOSE 80
 ENTRYPOINT ["dotnet", "GPTCvAssistant.dll"]
 ```
 
-## ?? Roadmap
+## 🎯 Roadmap
 
 - [ ] Integration with LinkedIn API
 - [ ] PDF resume generation
@@ -188,7 +189,7 @@ ENTRYPOINT ["dotnet", "GPTCvAssistant.dll"]
 - [ ] Advanced search capabilities
 - [ ] Mobile app companion
 
-## ?? Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -196,20 +197,20 @@ ENTRYPOINT ["dotnet", "GPTCvAssistant.dll"]
 4. Push to the branch
 5. Create a Pull Request
 
-## ?? License
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## ?? Support
+## 🆘 Support
 
 For issues and questions:
 - Create an issue in the repository
 - Contact: [your-email@domain.com]
 
-## ?? Keywords
+## 🔍 Keywords
 
 AI CV, Interactive Resume, Job Matching, ATS Optimization, Recruitment Technology, AI Assistant, Career Profile, Modern Hiring, Conversational Interface, Candidate Experience
 
 ---
 
-*Built with ?? for the future of recruitment*
+*Built with ❤️ for the future of recruitment*
