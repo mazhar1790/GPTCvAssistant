@@ -1,3 +1,4 @@
+using GPTCvAssistant.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
@@ -7,21 +8,89 @@ using System.Threading.Tasks;
 
 namespace GPTCvAssistant.Services
 {
-    public class JobMatchingAgent
+    /// <summary>
+    /// Service for analyzing job matches and generating tailored career materials
+    /// </summary>
+    public class JobMatchingService : IJobMatchingService
     {
-        private readonly GeminiService _geminiService;
+        private readonly IAiService _aiService;
         private readonly string _cvPath;
 
-        public JobMatchingAgent(GeminiService geminiService, IWebHostEnvironment env)
+        public JobMatchingService(IAiService aiService, IWebHostEnvironment env)
         {
-            _geminiService = geminiService;
+            _aiService = aiService ?? throw new ArgumentNullException(nameof(aiService));
             _cvPath = Path.Combine(env.ContentRootPath, "App_Data", "ExtractedCV.txt");
         }
 
         public async Task<JobMatchAnalysis> AnalyzeJobMatchAsync(string jobDescription)
         {
-            // Enhanced prompt for comprehensive job matching analysis
-            var analysisPrompt = $@"
+            if (string.IsNullOrWhiteSpace(jobDescription))
+                throw new ArgumentException("Job description cannot be empty", nameof(jobDescription));
+
+            var analysisPrompt = CreateJobAnalysisPrompt(jobDescription);
+
+            try
+            {
+                var analysisHtml = await _aiService.AskAsync(analysisPrompt);
+                
+                // Parse the response to extract structured data
+                var analysis = ParseAnalysisResponse(analysisHtml);
+                analysis.RawHtml = analysisHtml;
+                analysis.JobDescription = jobDescription;
+                analysis.AnalysisDate = DateTime.UtcNow;
+                
+                return analysis;
+            }
+            catch (Exception ex)
+            {
+                return CreateErrorAnalysis(ex, jobDescription);
+            }
+        }
+
+        public async Task<string> GenerateTargetedCoverLetterAsync(string jobDescription, string companyName = "")
+        {
+            if (string.IsNullOrWhiteSpace(jobDescription))
+                throw new ArgumentException("Job description cannot be empty", nameof(jobDescription));
+
+            var prompt = CreateCoverLetterPrompt(jobDescription, companyName);
+            return await _aiService.AskAsync(prompt);
+        }
+
+        public async Task<string> GenerateATSOptimizedSummaryAsync(string jobDescription)
+        {
+            if (string.IsNullOrWhiteSpace(jobDescription))
+                throw new ArgumentException("Job description cannot be empty", nameof(jobDescription));
+
+            var prompt = CreateATSOptimizationPrompt(jobDescription);
+            return await _aiService.AskAsync(prompt);
+        }
+
+        public async Task<List<string>> ExtractATSKeywordsAsync(string jobDescription)
+        {
+            if (string.IsNullOrWhiteSpace(jobDescription))
+                throw new ArgumentException("Job description cannot be empty", nameof(jobDescription));
+
+            var prompt = CreateKeywordExtractionPrompt(jobDescription);
+
+            try
+            {
+                var response = await _aiService.AskAsync(prompt);
+                var keywords = response.Split(',')
+                    .Select(k => k.Trim())
+                    .Where(k => !string.IsNullOrEmpty(k))
+                    .ToList();
+                
+                return keywords;
+            }
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
+        private static string CreateJobAnalysisPrompt(string jobDescription)
+        {
+            return $@"
                 Act as an Expert AI Recruitment Consultant and Job Match Analyst.
                 
                 Your task: Analyze the job description against Mazhar Hayat's CV and provide a comprehensive recruitment-grade analysis.
@@ -74,39 +143,11 @@ namespace GPTCvAssistant.Services
                 JOB DESCRIPTION TO ANALYZE:
                 {jobDescription}
             ";
-
-            try
-            {
-                var analysisHtml = await _geminiService.AskAsync(analysisPrompt);
-                
-                // Parse the response to extract structured data
-                var analysis = ParseAnalysisResponse(analysisHtml);
-                analysis.RawHtml = analysisHtml;
-                analysis.JobDescription = jobDescription;
-                analysis.AnalysisDate = DateTime.UtcNow;
-                
-                return analysis;
-            }
-            catch (Exception ex)
-            {
-                return new JobMatchAnalysis
-                {
-                    MatchScore = 0,
-                    RawHtml = $"<p class='text-danger'>Error analyzing job description: {ex.Message}</p>",
-                    Strengths = new List<string> { "Analysis failed - please try again" },
-                    Gaps = new List<string> { "Unable to determine gaps" },
-                    ATSKeywords = new List<string>(),
-                    TailoredPitch = "Unable to generate pitch due to analysis error",
-                    Recommendations = new List<string>(),
-                    JobDescription = jobDescription,
-                    AnalysisDate = DateTime.UtcNow
-                };
-            }
         }
 
-        public async Task<string> GenerateTargetedCoverLetterAsync(string jobDescription, string companyName = "")
+        private static string CreateCoverLetterPrompt(string jobDescription, string companyName)
         {
-            var prompt = $@"
+            return $@"
                 Act as a Professional Cover Letter Writer specializing in AI/Tech roles.
                 
                 Task: Write a compelling, ATS-optimized cover letter for Mazhar Hayat targeting this specific role.
@@ -131,13 +172,11 @@ namespace GPTCvAssistant.Services
                 Company: {companyName}
                 Job Description: {jobDescription}
             ";
-
-            return await _geminiService.AskAsync(prompt);
         }
 
-        public async Task<string> GenerateATSOptimizedSummaryAsync(string jobDescription)
+        private static string CreateATSOptimizationPrompt(string jobDescription)
         {
-            var prompt = $@"
+            return $@"
                 Act as an ATS Optimization Expert.
                 
                 Task: Rewrite Mazhar's professional summary to maximize ATS scoring for this specific job.
@@ -155,13 +194,11 @@ namespace GPTCvAssistant.Services
                 
                 Job Description: {jobDescription}
             ";
-
-            return await _geminiService.AskAsync(prompt);
         }
 
-        public async Task<List<string>> ExtractATSKeywordsAsync(string jobDescription)
+        private static string CreateKeywordExtractionPrompt(string jobDescription)
         {
-            var prompt = $@"
+            return $@"
                 Act as an ATS Keyword Extraction Expert.
                 
                 Task: Extract the most critical keywords and phrases that an ATS system would scan for in this job description.
@@ -177,21 +214,6 @@ namespace GPTCvAssistant.Services
                 
                 Job Description: {jobDescription}
             ";
-
-            try
-            {
-                var response = await _geminiService.AskAsync(prompt);
-                var keywords = response.Split(',')
-                    .Select(k => k.Trim())
-                    .Where(k => !string.IsNullOrEmpty(k))
-                    .ToList();
-                
-                return keywords;
-            }
-            catch
-            {
-                return new List<string>();
-            }
         }
 
         private JobMatchAnalysis ParseAnalysisResponse(string htmlResponse)
@@ -200,8 +222,7 @@ namespace GPTCvAssistant.Services
             
             try
             {
-                // Basic parsing - in a production app, you'd use a proper HTML parser
-                // Extract match score
+                // Extract match score using regex
                 var matchScoreMatch = System.Text.RegularExpressions.Regex.Match(
                     htmlResponse, @"Overall Match:\s*(\d+)%", 
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
@@ -211,7 +232,7 @@ namespace GPTCvAssistant.Services
                     analysis.MatchScore = score;
                 }
 
-                // For now, set default values - in production, you'd parse the HTML properly
+                // For production, implement proper HTML parsing
                 analysis.Strengths = ExtractListItems(htmlResponse, "strengths");
                 analysis.Gaps = ExtractListItems(htmlResponse, "gaps");
                 analysis.ATSKeywords = ExtractKeywords(htmlResponse);
@@ -221,7 +242,7 @@ namespace GPTCvAssistant.Services
             catch
             {
                 // Set defaults if parsing fails
-                analysis.MatchScore = 75; // Default reasonable score
+                analysis.MatchScore = 75;
                 analysis.Strengths = new List<string> { "Technical expertise", "Leadership experience" };
                 analysis.Gaps = new List<string> { "See detailed analysis above" };
                 analysis.ATSKeywords = new List<string> { "AI", ".NET", "Azure", "RAG", "LLM" };
@@ -232,15 +253,30 @@ namespace GPTCvAssistant.Services
             return analysis;
         }
 
+        private static JobMatchAnalysis CreateErrorAnalysis(Exception ex, string jobDescription)
+        {
+            return new JobMatchAnalysis
+            {
+                MatchScore = 0,
+                RawHtml = $"<p class='text-danger'>Error analyzing job description: {ex.Message}</p>",
+                Strengths = new List<string> { "Analysis failed - please try again" },
+                Gaps = new List<string> { "Unable to determine gaps" },
+                ATSKeywords = new List<string>(),
+                TailoredPitch = "Unable to generate pitch due to analysis error",
+                Recommendations = new List<string>(),
+                JobDescription = jobDescription,
+                AnalysisDate = DateTime.UtcNow
+            };
+        }
+
         private List<string> ExtractListItems(string html, string section)
         {
-            // Simplified extraction - in production, use a proper HTML parser
+            // Simplified extraction - in production, use a proper HTML parser like HtmlAgilityPack
             return new List<string> { $"See {section} in detailed analysis above" };
         }
 
         private List<string> ExtractKeywords(string html)
         {
-            // Simplified extraction
             return new List<string> { "AI", ".NET", "Azure", "RAG", "LLM", "Solutions Architecture" };
         }
 
@@ -250,6 +286,9 @@ namespace GPTCvAssistant.Services
         }
     }
 
+    /// <summary>
+    /// Data model for job match analysis results
+    /// </summary>
     public class JobMatchAnalysis
     {
         public int MatchScore { get; set; }
