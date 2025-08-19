@@ -1,216 +1,232 @@
-﻿# AI-Powered Career Profile Assistant
+﻿# 🚀 GPT CV Assistant - Modernized AI-Powered Career Platform
 
-An innovative, interactive CV platform that transforms traditional resume presentation into an engaging AI-driven conversation experience. Built for modern recruitment, this application allows recruiters and employers to explore candidate information through natural language interactions.
+[![.NET](https://img.shields.io/badge/.NET-7.0-blue.svg)](https://dotnet.microsoft.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/mazharhayyat/gpt-cv-assistant)
 
-## 🚀 Features
+A cutting-edge AI-powered interactive CV platform designed for modern recruitment and career development. Built with ASP.NET Core MVC and integrated with multiple AI services including OpenAI and Google Gemini.
 
-### Core Capabilities
-- **Interactive Chat Interface**: Natural conversation with AI about candidate experience
-- **Multi-AI Support**: Integration with both OpenAI and Google Gemini APIs
-- **Job Matching Agent**: Advanced job description analysis and matching
-- **ATS Optimization**: Keyword extraction and resume optimization for Applicant Tracking Systems
-- **Cover Letter Generation**: AI-powered, tailored cover letters for specific roles
-- **Interview Simulation**: Mock interview sessions with AI feedback
-- **Document Generation**: Customized CV variants and LinkedIn profiles
+## 🌟 Features
 
-### Technical Features
-- **Real-time Processing**: Instant AI responses with typing indicators
-- **Session Management**: Persistent chat history and user preferences
-- **HTML Sanitization**: Secure content rendering with XSS protection
-- **Export Functionality**: Download conversation transcripts
-- **Responsive Design**: Mobile-first UI with Bootstrap 5
-- **Voice Input**: Speech-to-text integration
-- **Search & Filter**: History search and content filtering
-- **Theme Support**: Light/dark mode toggle
+### Core Functionality
+- **🤖 Dual AI Integration**: Seamlessly integrated with both OpenAI GPT-4 and Google Gemini 2.0
+- **💬 Interactive Chat Interface**: Natural language conversation about career achievements
+- **🎯 Job Match Agent**: AI-powered job analysis, cover letter generation, and ATS optimization
+- **📊 Performance Monitoring**: Built-in metrics and health checks
+- **🔒 Enterprise Security**: CSRF protection, input sanitization, and secure session management
 
-## 🛠 Technology Stack
+### Advanced AI Capabilities
+- **📋 Resume Analysis**: Intelligent parsing and highlighting of key skills and experiences
+- **✍️ Cover Letter Generation**: Tailored cover letters based on job descriptions
+- **🔍 ATS Optimization**: Keyword extraction and resume optimization for ATS systems
+- **🎯 Job Matching**: Comprehensive job fit analysis with strengths and gap identification
+- **🗣️ Interview Preparation**: AI-powered interview coaching and question practice
 
-- **Backend**: ASP.NET Core 7.0 (C#)
-- 
-- **Frontend**: Razor Pages, Bootstrap 5, jQuery
-- **AI Services**: OpenAI GPT-4, Google Gemini
-- **Session Storage**: In-memory caching
-- **Security**: HTML Sanitizer (HtmlAgilityPack)
-- **Styling**: CSS3 with custom animations
-- **Icons**: Font Awesome 6
+### Technical Excellence
+- **⚡ High Performance**: Response caching, compression, and optimized data handling
+- **🛡️ Robust Error Handling**: Global exception middleware with detailed error categorization
+- **📈 Health Monitoring**: Comprehensive health checks for all AI services
+- **🎨 Modern UI/UX**: Responsive design with dark/light theme support
+- **📱 Mobile-Optimized**: Fully responsive across all device sizes
 
-## 📁 Project Structure
+## 🏗️ Architecture
 
-```
-GPTCvAssistant/
-├── Configuration/          # Settings and configuration classes
-├── Constants/             # Application constants and enums
-├── Controllers/           # MVC controllers
-├── Extensions/            # Extension methods
-├── Middleware/            # Custom middleware
-├── Models/               # Data models and DTOs
-├── Services/             # Business logic and AI services
-│   ├── Interfaces/       # Service contracts
-│   └── Implementation/   # Service implementations
-├── Views/                # Razor views and templates
-└── wwwroot/             # Static files (CSS, JS, images)
-```
+### Technology Stack
+- **Backend**: ASP.NET Core 7.0 MVC
+- **Frontend**: Bootstrap 5, jQuery, Modern JavaScript
+- **AI Services**: OpenAI GPT-4, Google Gemini 2.0
+- **Logging**: Serilog with file and console outputs
+- **Caching**: In-memory caching with configurable expiration
+- **Security**: HTML Sanitization, CSRF protection, secure headers
 
-## ⚙️ Configuration
-
-### Required API Keys
-
-1. **OpenAI/Azure OpenAI**:
-   ```json
-   {
-     "OpenAI": {
-       "ApiKey": "your-openai-api-key",
-       "ApiEndpoint": "your-endpoint-url",
-       "ModelName": "gpt-4o"
-     }
-   }
-   ```
-
-2. **Google Gemini**:
-   ```json
-   {
-     "Gemini": {
-       "ApiKey": "your-gemini-api-key",
-       "BaseUrl": "https://generativelanguage.googleapis.com/v1beta/",
-       "ModelName": "gemini-2.0-flash"
-     }
-   }
-   ```
-
-### CV Data Setup
-
-Place the candidate's CV content in:
-```
-App_Data/ExtractedCV.txt
-```
-
-## 🏃‍♂️ Getting Started
+### Project StructureGPTCvAssistant/
+├── Controllers/          # MVC Controllers
+├── Services/            # AI and business logic services
+├── Models/              # Data models and DTOs
+├── Views/               # Razor views and layouts
+├── Configuration/       # Settings and configuration classes
+├── Middleware/          # Custom middleware components
+├── Constants/           # Application constants
+├── Extensions/          # Extension methods and utilities
+├── wwwroot/            # Static assets (CSS, JS, images)
+└── App_Data/           # CV and data files
+## 🚀 Getting Started
 
 ### Prerequisites
 - .NET 7.0 SDK or later
-- Valid OpenAI and/or Gemini API keys
-- Web browser with JavaScript enabled
+- Visual Studio 2022 or VS Code
+- OpenAI API key (Azure OpenAI or OpenAI)
+- Google AI API key (for Gemini)
 
 ### Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone [repository-url]
-   cd GPTCvAssistant
-   ```
+1. **Clone the repository**git clone https://github.com/mazharhayyat/gpt-cv-assistant.git
+cd gpt-cv-assistant
+2. **Configure API Keys**
+   Update `appsettings.json` with your API keys:{
+  "OpenAI": {
+    "ApiKey": "your-openai-api-key",
+    "ApiEndpoint": "your-azure-openai-endpoint"
+  },
+  "Gemini": {
+    "ApiKey": "your-gemini-api-key"
+     }
+   }
+3. **Install Dependencies**dotnet restore
+4. **Run the Application**dotnet run
+5. **Access the Application**
+   Navigate to `https://localhost:7000` in your browser
 
-2. **Configure API keys** in `appsettings.json`
+## 🔧 Configuration
 
-3. **Add CV content** to `App_Data/ExtractedCV.txt`
+### AI Service Configuration
 
-4. **Install dependencies**:
-   ```bash
-   dotnet restore
-   ```
+#### OpenAI Settings{
+  "OpenAI": {
+    "ApiKey": "your-key",
+    "ApiEndpoint": "your-endpoint",
+    "ModelName": "gpt-4o",
+    "Temperature": 0.7,
+    "MaxTokens": 2048,
+    "TimeoutSeconds": 120
+  }
+}
+#### Gemini Settings{
+  "Gemini": {
+    "ApiKey": "your-key",
+    "BaseUrl": "https://generativelanguage.googleapis.com/v1beta/",
+    "ModelName": "gemini-2.0-flash",
+    "Temperature": 0.7,
+    "MaxOutputTokens": 2048
+  }
+}
+### Application Features{
+  "Application": {
+    "Features": {
+      "EnableCaching": true,
+      "EnableHealthChecks": true,
+      "EnableDetailedLogging": true,
+      "EnablePerformanceMetrics": true
+    }
+  }
+}
+## 🎯 Usage Examples
 
-5. **Run the application**:
-   ```bash
-   dotnet run
-   ```
+### Basic Chat Interaction// Ask about technical skills
+"What are Mazhar's key technical competencies in AI and cloud architecture?"
 
-6. **Open browser** and navigate to `https://localhost:7000`
+// Career summary request
+"Summarize Mazhar's career journey as an AI Solutions Architect"
 
-## 💡 Usage Examples
+// Project showcase
+"Show examples of AI projects Mazhar has delivered"
+### Job Match Agent// Analyze job fit
+POST /Chat/AnalyzeJob
+{
+  "jobDescription": "Senior AI Solutions Architect role...",
+  "companyName": "Microsoft",
+  "targetRole": "AI Solutions Architect"
+}
 
-### For Recruiters
-- Ask about specific technical skills: *"What's Mazhar's experience with Azure?"*
-- Explore project history: *"Tell me about his AI projects"*
-- Assess cultural fit: *"What leadership roles has he held?"*
+// Generate cover letter
+POST /Chat/GenerateCoverLetter
+{
+  "jobDescription": "...",
+  "companyName": "Microsoft"
+}
+## 📊 Health Monitoring
 
-### Job Matching
-- Paste job description for instant analysis
-- Get match percentage and gap analysis
-- Generate tailored cover letters
-- Extract ATS-optimized keywords
+The application includes comprehensive health checks accessible at `/health`:
+{
+  "status": "Healthy",
+  "checks": [
+    {
+      "name": "gemini",
+      "status": "Healthy",
+      "duration": "00:00:01.234"
+    },
+    {
+      "name": "openai",
+      "status": "Healthy",
+      "duration": "00:00:00.987"
+    }
+  ]
+}
+## 🛡️ Security Features
 
-### Interview Preparation
-- Start mock interview sessions
-- Get AI-generated questions for specific roles
-- Practice responses with instant feedback
+- **Input Sanitization**: All user inputs are sanitized using HtmlSanitizer
+- **CSRF Protection**: Built-in anti-forgery token validation
+- **Secure Headers**: Comprehensive security headers for production
+- **Session Security**: Secure session management with timeout
+- **Error Handling**: Sanitized error messages to prevent information leakage
 
-## 🔧 Architecture Highlights
+## 🔄 Recent Improvements (v2.1.0)
 
-### Dependency Injection
-- Clean separation of concerns
-- Interface-based service contracts
-- Scoped service lifetimes for session management
+### Architecture Enhancements
+- ✅ Modernized dependency injection and service registration
+- ✅ Enhanced configuration validation with data annotations
+- ✅ Comprehensive logging with Serilog integration
+- ✅ Performance monitoring and metrics collection
+- ✅ Robust error handling with categorized exception responses
 
-### Error Handling
-- Global exception middleware
-- Structured logging with Serilog
-- Graceful degradation for API failures
+### AI Service Improvements
+- ✅ Dual AI provider support (OpenAI + Gemini)
+- ✅ Response caching for improved performance
+- ✅ Health checks for AI service availability
+- ✅ Enhanced prompt engineering for better responses
+- ✅ Timeout and retry handling
 
-### Security
-- HTML sanitization for all AI responses
-- Session-based state management
-- HTTPS enforcement in production
+### User Experience
+- ✅ Modernized chat interface with better styling
+- ✅ Enhanced Job Match Agent with multiple features
+- ✅ Improved session management and history
+- ✅ Better mobile responsiveness
+- ✅ Dark/light theme support
 
-### Performance
-- Async/await patterns throughout
-- HTTP client factory for API calls
-- Session-based caching for chat history
-
-## 🚀 Deployment
-
-### Development
-```bash
-dotnet run --environment Development
-```
-
-### Production
-```bash
-dotnet publish -c Release
-# Deploy to your preferred hosting platform
-```
-
-### Docker (Optional)
-```dockerfile
-# Dockerfile example
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
-COPY . /app
-WORKDIR /app
-EXPOSE 80
-ENTRYPOINT ["dotnet", "GPTCvAssistant.dll"]
-```
-
-## 🎯 Roadmap
-
-- [ ] Integration with LinkedIn API
-- [ ] PDF resume generation
-- [ ] Multi-language support
-- [ ] Analytics dashboard
-- [ ] Email integration for sharing
-- [ ] Candidate profile templates
-- [ ] Advanced search capabilities
-- [ ] Mobile app companion
+### Code Quality
+- ✅ Comprehensive error handling and logging
+- ✅ Enhanced security measures
+- ✅ Performance optimizations
+- ✅ Better code organization and documentation
+- ✅ Unit test ready architecture
 
 ## 🤝 Contributing
 
+Contributions are welcome! Please feel free to submit a Pull Request.
+
 1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 👤 About Mazhar Hayat
 
-For issues and questions:
-- Create an issue in the repository
-- Contact: [your-email@domain.com]
+**AI Solutions Architect | .NET Expert | Cloud Innovator**
 
-## 🔍 Keywords
+Based in Abu Dhabi, UAE, Mazhar specializes in:
+- 🤖 AI-powered enterprise solutions
+- 🔗 Large Language Model (LLM) integration
+- 📚 Retrieval-Augmented Generation (RAG) systems
+- ☁️ Azure cloud architecture
+- 💻 .NET ecosystem development
 
-AI CV, Interactive Resume, Job Matching, ATS Optimization, Recruitment Technology, AI Assistant, Career Profile, Modern Hiring, Conversational Interface, Candidate Experience
+Connect with Mazhar:
+- 💼 [LinkedIn](https://www.linkedin.com/in/mazharhayyat)
+- 🌐 [Portfolio](https://mazharhayyat.dev)
+
+## 🙏 Acknowledgments
+
+- OpenAI for the GPT-4 API
+- Google for the Gemini AI API
+- ASP.NET Core team for the excellent framework
+- Bootstrap team for the responsive framework
+- All contributors and supporters
 
 ---
 
-*Built with ❤️ for the future of recruitment*
+**Made with ❤️ in Abu Dhabi | Powered by AI | Built for the Future**
