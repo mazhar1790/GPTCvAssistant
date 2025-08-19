@@ -218,7 +218,7 @@ namespace GPTCvAssistant.Controllers
                     _ => $"Rewrite LinkedIn 'About' for {role}. HTML only."
                 };
                 
-                var html = await _openAiService.AskQuestionAsync(instruction);
+                var html = await _openAiService.AskAsync(instruction);
                 var clean = _sanitizer.Sanitize(html);
                 
                 return Json(new { success = true, html = clean });
