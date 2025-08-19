@@ -13,6 +13,107 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://js.puter.com/v2/"></script>
+    <style>
+        /* Special Intent Cards Fixes */
+        .career-summary-card {
+            background-color: rgba(108, 99, 255, 0.08) !important;
+            border-left-width: 6px !important;
+            border-left-color: #6c63ff !important;
+            border-left-style: solid !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+            margin: 1rem 0 !important;
+            position: relative !important;
+        }
+
+        .skills-highlight-card {
+            background-color: rgba(40, 167, 69, 0.08) !important;
+            border-left-width: 6px !important;
+            border-left-color: #28a745 !important;
+            border-left-style: solid !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+            margin: 1rem 0 !important;
+            position: relative !important;
+        }
+
+        /* Override the default chat-entry::before for special cards */
+        .career-summary-card::before,
+        .skills-highlight-card::before {
+            display: none !important;
+        }
+
+        /* Dark mode enhancements for special cards */
+        .dark-mode .career-summary-card {
+            background-color: rgba(108, 99, 255, 0.15) !important;
+            border-left-color: #9590ff !important;
+        }
+
+        .dark-mode .skills-highlight-card {
+            background-color: rgba(40, 167, 69, 0.15) !important;
+            border-left-color: #47d364 !important;
+        }
+
+        /* Special response styling for these cards */
+        .career-summary-card .response-html,
+        .skills-highlight-card .response-html {
+            background-color: transparent !important;
+            border: none !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Ensure headers in special cards look good */
+        .career-summary-card h3,
+        .skills-highlight-card h3 {
+            font-weight: 600 !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.75rem !important;
+            color: inherit !important;
+        }
+    </style>
+    <!-- Define global functions that need to be available before DOM is loaded -->
+    <script>
+        // Global functions for button click handlers
+        function submitPrompt(prompt, intent = 'Default') {
+            if (!prompt && intent === 'Default') {
+                console.error('submitPrompt called without prompt or intent');
+                return;
+            }
+            
+            console.log(`submitPrompt called with prompt: ${prompt}, intent: ${intent}`);
+            
+            // If chatApp isn't ready yet, wait and retry
+            if (typeof chatApp === 'undefined') {
+                console.log('chatApp not ready, waiting...');
+                setTimeout(() => submitPrompt(prompt, intent), 100);
+                return;
+            }
+            
+            // Set the value in the input field for visibility
+            $('#userQuestion').val(prompt).focus();
+            
+            // Call the sendMessage method with the specified intent
+            chatApp.sendMessage(intent);
+        }
+
+        function prefill(text) {
+            const box = document.getElementById('userQuestion');
+            if (!box) return;
+            box.value = text;
+            box.focus();
+        }
+
+        function toggleSearch() {
+            const wrap = document.getElementById('searchWrapper');
+            if (wrap) {
+                wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
+                if (wrap.style.display === 'block') {
+                    document.getElementById('searchBox').focus();
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <button id="themeToggle" class="btn">🌙</button>
@@ -31,14 +132,25 @@
         <div id="alertContainer"></div>
 
         <div class="action-bar">
-            <button id="clearBtn" type="button" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-trash me-2"></i>Clear History
-            </button>
-            <button id="downloadBtn" type="button" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-download me-2"></i>Download Transcript
+            <!-- Agentic actions (tailored to your profile) -->
+            <button class="btn btn-outline-primary btn-arrow"
+                    onclick="prefill('Interview me for an AI Solutions Architect role focusing on .NET, LLM, RAG, and Azure')">
+                Interview Me
             </button>
 
+            <button class="btn btn-outline-primary btn-arrow"
+                    onclick="prefill('Write a cover letter for an AI Solutions Architect position in Abu Dhabi highlighting my .NET, LLM, RAG, and Azure experience')">
+                Generate Cover Letter
+            </button>
+
+            <!-- Utilities -->
+            <button class="btn btn-outline-primary" onclick="toggleSearch()">Search History</button>
+            <button class="btn btn-outline-danger" onclick="chatApp.clearHistory()">Clear History</button>
+            <button class="btn btn-outline-primary" onclick="chatApp.downloadTranscript()">Download</button>
+            <button class="btn btn-outline-primary" onclick="prefill('reset interview')">Reset Interview</button>
         </div>
+
+
 
         <div id="pinnedWrapper" class="chat-history mb-4" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -88,18 +200,29 @@
         </div>
 
 
-        @if (Model?.SuggestedPrompts?.Any() == true)
+        @foreach (var prompt in Model.SuggestedPrompts)
         {
-            <div class="glass-effect mb-3 px-3 py-2" style="margin:28px">
-                <p class="mb-2 text-muted fw-semibold small">Suggested questions:</p>
-                <div class="suggestion-scroll px-1">
-                    @foreach (var prompt in Model.SuggestedPrompts)
-                    {
-                        <button class="btn btn-outline-primary btn-sm me-2 mb-1" onclick="submitPrompt('@prompt')">@prompt</button>
-                    }
-                </div>
-            </div>
-
+            if (prompt.Contains("Summarize Mazhar"))
+            {
+                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                        onclick="submitPrompt('@prompt', 'CareerSummary')">
+                    @prompt
+                </button>
+            }
+            else if (prompt.Contains("Highlight"))
+            {
+                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                        onclick="submitPrompt('@prompt', 'SkillsHighlight')">
+                    @prompt
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                        onclick="submitPrompt('@prompt', 'Default')">
+                    @prompt
+                </button>
+            }
         }
 
 
@@ -160,21 +283,15 @@
 
             initializeEventListeners() {
                 // Submit button click
-                $('#submitBtn').click(() => this.submitQuestion());
+                $('#submitBtn').click(() => this.sendMessage());
 
                 // Enter key press
                 $('#userQuestion').keypress((e) => {
                     if (e.which === 13 && !e.shiftKey) {
                         e.preventDefault();
-                        this.submitQuestion();
+                        this.sendMessage();
                     }
                 });
-
-                // Clear history button
-                $('#clearBtn').click(() => this.clearHistory());
-
-                // Download transcript button
-                $('#downloadBtn').click(() => this.downloadTranscript());
 
                 // Voice input button
                 $('#voiceBtn').click(() => this.startVoiceRecognition());
@@ -182,19 +299,26 @@
                 // Theme toggle button
                 $('#themeToggle').click(() => this.toggleTheme());
 
-                $('#searchBox').on('input', function () {
-                        const query = $(this).val().toLowerCase();
-                        $('.chat-entry').each(function () {
+                $('#searchBox').on('input', (e) => {
+                    const query = $(e.target).val().toLowerCase();
+                    $('.chat-entry').each(function () {
                         const text = $(this).text().toLowerCase();
                         $(this).toggle(text.includes(query));
-                        });
+                    });
                 });
             }
 
-
-            async submitQuestion() {
+            // Unified method to send messages with optional intent
+            async sendMessage(intent = 'Default') {
+                // Get the question from the input field
                 const question = $('#userQuestion').val().trim();
-                if (!question) {
+                
+                // For intents that require a question, validate the input
+                const requiresQuestion = intent !== 'ClearHistory' && 
+                                        intent !== 'DownloadTranscript' &&
+                                        intent !== 'SuggestPrompts';
+                                        
+                if (requiresQuestion && !question) {
                     this.showAlert('Please enter a question', 'warning');
                     return;
                 }
@@ -202,20 +326,75 @@
                 this.setLoading(true);
 
                 try {
-                    const response = await $.ajax({
-                        url: '/Chat/Chat',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ userQuestion: question }),
-                        dataType: 'json'
-                    });
+                    console.log(`Sending request with intent: ${intent}`);
+                    
+                    // Create a properly formed payload object with correctly formatted Intent
+                    const payload = {
+                        UserQuestion: question || null,
+                        Intent: intent
+                    };
 
-                    if (response.success) {
-                        this.addChatEntry(response.exchange);
-                        $('#userQuestion').val('');
-                        this.scrollToBottom();
+                    console.log('Sending payload:', payload);
+
+                    const response = await fetch('/Chat/Chat', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        console.error('Response not OK:', response.status, response.statusText);
+                        this.showAlert(`Server error: ${response.status} ${response.statusText}`, 'danger');
+                        this.setLoading(false);
+                        return;
+                    }
+
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const json = await response.json();
+                        console.log('Response received:', json);
+
+                        if (json.success) {
+                            // Handle different response types
+                            if (json.exchange) {
+                                // Make sure we use the correct intent label
+                                const effectiveIntent = json.intent || intent;
+                                console.log('Using effective intent:', effectiveIntent);
+                                this.addChatEntry(json.exchange, effectiveIntent);
+                                $('#userQuestion').val('');
+                                this.scrollToBottom();
+                            }
+
+                            // Handle search history results
+                            if (json.history) {
+                                this.renderHistory(json.history, 'SearchHistory');
+                            }
+
+                            // Handle suggestions
+                            if (json.suggestions) {
+                                // Process suggestions if needed
+                            }
+                        } else {
+                            this.showAlert(json.message || 'Failed to get response', 'danger');
+                        }
+                    } else if (contentType && contentType.indexOf("application/octet-stream") !== -1) {
+                        // Handle file download response
+                        const blob = await response.blob();
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'CV-GPT-Transcript.txt';
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(url);
+                        this.showToast('Transcript download started!');
                     } else {
-                        this.showAlert(response.message || 'Failed to get response', 'danger');
+                        console.error('Unexpected content type:', contentType);
+                        this.showAlert('Unexpected response type from server', 'danger');
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -230,49 +409,43 @@
                     return;
                 }
                 $('#searchWrapper').hide();
+                
                 try {
-                    const response = await $.ajax({
-                        url: '/Chat/ClearHistory',
-                        type: 'POST',
-                        dataType: 'json'
-                    });
-
-                    if (response.success) {
-                        $('#chatHistory').html(`
-                            <div class="text-center text-muted glass-effect" style="padding: 3rem; border-radius: 16px;">
-                                <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
-                                <p class="mb-0">No chat history yet. Ask your first question!</p>
-                            </div>
-                        `);
-                        this.showToast('History cleared successfully!');
-                    } else {
-                        this.showAlert(response.message || 'Failed to clear history', 'danger');
-                    }
+                    // Call the sendMessage method with ClearHistory intent
+                    await this.sendMessage('ClearHistory');
+                    
+                    // Clear UI immediately for better user experience
+                    $('#chatHistory').html(`
+                        <div class="text-center text-muted glass-effect" style="padding: 3rem; border-radius: 16px;">
+                            <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                            <p class="mb-0">No chat history yet. Ask your first question!</p>
+                        </div>
+                    `);
+                    this.showToast('History cleared successfully!');
                 } catch (error) {
                     console.error('Error:', error);
-                    this.showAlert('Network error occurred. Please try again.', 'danger');
+                    this.showAlert('Failed to clear history. Please try again.', 'danger');
                 }
             }
 
             async downloadTranscript() {
                 try {
                     // First check if there's any history
-                    const checkResponse = await $.ajax({
-                        url: '/Chat/GetHistory',
-                        type: 'GET',
-                        dataType: 'json'
-                    });
+                    const checkResponse = await fetch('/Chat/GetHistory');
+                    const checkJson = await checkResponse.json();
 
-                    if (!checkResponse.success || !checkResponse.history || checkResponse.history.length === 0) {
+                    if (!checkJson.success || !checkJson.history || checkJson.history.length === 0) {
                         this.showAlert('No chat history to download', 'warning');
                         return;
                     }
 
-                    // Create a temporary form to trigger file download
-                    const form = $('<form method="POST" action="/Chat/DownloadTranscript"></form>');
-                    $('body').append(form);
+                    // Create a form and submit it to trigger the file download
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/Chat/DownloadTranscript';
+                    document.body.appendChild(form);
                     form.submit();
-                    form.remove();
+                    document.body.removeChild(form);
 
                     this.showToast('Transcript download started!');
                 } catch (error) {
@@ -314,24 +487,73 @@
                 recognition.start();
             }
 
-            addChatEntry(exchange) {
+            addChatEntry(exchange, intentLabel = '') {
                 const historyContainer = $('#chatHistory');
                 historyContainer.find('.text-center.text-muted').remove();
 
-                const tone = this.getTone(exchange.answer);
-                const toneClass = '' /* tone ? `tone-${tone}` : ''; */
+                console.log('Adding chat entry with intent:', intentLabel);
+                
+                const badge = intentLabel && intentLabel !== 'Default' ? 
+                    `<span style="float:right;opacity:.7;font-size:.8rem">${intentLabel}</span>` : '';
+
+                // Determine the card class based on intent
+                let cardClass = 'chat-entry';
+
+                // Make case-insensitive comparison to be more robust
+                const intentLower = String(intentLabel).toLowerCase();
+
+                if (intentLower.includes('career') || intentLower === 'careersummary') {
+                    console.log('Adding career-summary-card class');
+                    cardClass = 'career-summary-card';
+                } else if (intentLower.includes('skill') || intentLower === 'skillshighlight') {
+                    console.log('Adding skills-highlight-card class');
+                    cardClass = 'skills-highlight-card';
+                }
+
+                // Add timestamp for debugging
+                const timestamp = new Date().toISOString();
+                console.log(`[${timestamp}] Creating chat entry with class: ${cardClass}`);
 
                 const entryHtml = `
-                    <div class="chat-entry ${toneClass}">
-                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)}</p>
+                    <div class="${cardClass}" id="entry-${Date.now()}">
+                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${this.escapeHtml(exchange.userQuestion)} ${badge}</p>
                         <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
                         <div class="response-html">${exchange.answer}</div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-sm btn-outline-secondary btn-ask-again" data-question="${this.escapeHtml(exchange.userQuestion)}">
+                                🔁
+                            </button>
+                            <button class="btn btn-sm btn-outline-success btn-pin-answer" style="margin-right:5px" data-index="${Date.now()}">
+                                📌
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary btn-copy-answer">
+                                📋
+                            </button>
+                        </div>
                     </div>
                 `;
                 historyContainer.append(entryHtml);
+                
+                // Verify class was applied after the element was added to DOM
+                const newEntryId = `entry-${Date.now()}`;
+                setTimeout(() => {
+                    const entryClasses = $(`#${newEntryId}`).attr('class');
+                    console.log(`Added entry classes: ${entryClasses}`);
+                    
+                    // Force reflow to ensure styling is applied
+                    $(`#${newEntryId}`).addClass('force-reflow');
+                }, 100);
+                
                 this.scrollToBottom();
             }
 
+            renderHistory(items, intentLabel) {
+                const container = $('#chatHistory');
+                container.html('');
+
+                items.forEach(x => this.addChatEntry(x, intentLabel));
+                this.scrollToBottom();
+            }
 
             setLoading(isLoading) {
                 const submitBtn = $('#submitBtn');
@@ -349,14 +571,15 @@
                 }
             }
 
-               scrollToBottom() {
-                    const chatHistory = $('#chatHistory')[0];
+            scrollToBottom() {
+                const chatHistory = $('#chatHistory')[0];
+                if (chatHistory) {
                     chatHistory.scrollTo({
                         top: chatHistory.scrollHeight,
                         behavior: 'smooth'
                     });
                 }
-
+            }
 
             showAlert(message, type = 'info') {
                 const icons = {
@@ -434,8 +657,8 @@
                 div.textContent = text;
                 return div.innerHTML;
             }
+
             getTone(text) {
-                text = 'be careful';
                 const lower = text.toLowerCase();
                 if (/(great job|well done|impressive|amazing|excellent)/.test(lower)) return 'success';
                 if (/(warning|note:|caution|be careful)/.test(lower)) return 'warning';
@@ -443,164 +666,219 @@
                 if (/(sorry|cannot|failed|error|unfortunately)/.test(lower)) return 'danger';
                 return null;
             }
-
         }
+
+        // Global chat app instance
+        let chatApp;
 
         // Initialize the app when the page loads
         $(document).ready(() => {
-            new ChatApp();
+            chatApp = new ChatApp();
+            
+            // Initialize pinned answers
+            let pinnedMap = new Map();
             loadPinned();
 
-         if ($('.chat-entry').length >= 9) {
-            $('#searchWrapper').show();
-         }
+            function loadPinned() {
+                const pinned = JSON.parse(localStorage.getItem('pinnedAnswers') || '[]');
 
-         if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-            $('#voiceBtn').hide(); // or $('#voiceBtn').addClass('d-none');
-         }
+                if (pinned.length === 0) {
+                    $('#pinnedWrapper').hide();
+                    return;
+                }
 
-         if ($('.chat-entry').length >= 9) {
-            $('#searchWrapper').show();
-         }
-
-         const chatHistory = $('#chatHistory');
-
-        chatHistory.on('scroll', function () {
-            const nearBottom = chatHistory[0].scrollTop + chatHistory[0].clientHeight >= chatHistory[0].scrollHeight - 100;
-            $('#scrollToBottom').toggle(!nearBottom);
-        });
-
-        $('#profileName').hover(
-            function () {
-                $('#profileCard').fadeIn(200);
-            },
-            function () {
-                setTimeout(() => {
-                    if (!$('#profileCard').is(':hover')) $('#profileCard').fadeOut(200);
-                }, 300);
-            }
-        );
-
-        $('#profileCard').mouseleave(() => {
-            $('#profileCard').fadeOut(200);
-        });
-
-
-        });
-
-        function submitPrompt(prompt) {
-           $('#userQuestion').val(prompt).focus();
-           $('#submitBtn').click();
-        }
-
-        $(document).on('click', '.btn-ask-again', function () {
-            const question = $(this).data('question');
-            $('#userQuestion').val(question).focus();
-            $('#submitBtn').click();
-        });
-
-        let pinnedMap = new Map();
-
-         function loadPinned() {
-            const pinned = JSON.parse(localStorage.getItem('pinnedAnswers') || '[]');
-
-            // ✅ Fix: hide wrapper if there are no pins
-            if (pinned.length === 0) {
-                $('#pinnedWrapper').hide();  // this line fixes the issue
-                return;
+                $('#pinnedWrapper').show();
+                for (const entry of pinned) {
+                    renderPinned(entry.index, entry.question, entry.answer);
+                    pinnedMap.set(entry.index, true);
+                }
             }
 
-            $('#pinnedWrapper').show();
-            for (const entry of pinned) {
-                renderPinned(entry.index, entry.question, entry.answer);
-                pinnedMap.set(entry.index, true);
-            }
-        }
-
-
-
-        function savePinned() {
-            const data = Array.from(pinnedMap.entries()).map(([index, html]) => html);
-            localStorage.setItem('pinnedAnswers', JSON.stringify(data));
-        }
-
-        function renderPinned(index, question, answer) {
-            const html = `
-                <div class="chat-entry" data-index="${index}">
-                    <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${$('<div>').text(question).html()}</p>
-                    <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
-                    <div class="response-html">${answer}</div>
-                    <div class="d-flex justify-content-end mt-2">
-                        <button class="btn btn-sm btn-outline-danger btn-unpin" data-index="${index}">❌ Unpin</button>
+            function renderPinned(index, question, answer) {
+                const html = `
+                    <div class="chat-entry" data-index="${index}">
+                        <p><strong><i class="fas fa-user me-2"></i>You:</strong> ${$('<div>').text(question).html()}</p>
+                        <p><strong><i class="fas fa-robot me-2"></i>Assistant:</strong></p>
+                        <div class="response-html">${answer}</div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-sm btn-outline-danger btn-unpin" data-index="${index}">❌ Unpin</button>
+                        </div>
                     </div>
-                </div>
-            `;
-            $('#pinnedAnswers').append(html);
-        }
-
-        $(document).on('click', '.btn-pin-answer', function () {
-            const $btn = $(this);
-            const entry = $btn.closest('.chat-entry');
-            const index = $btn.data('index');
-            const question = entry.find('p').eq(0).text().replace("You:", "").trim();
-            const answer = entry.find('.response-html').html();
-
-            if (pinnedMap.has(index)) return;
-
-            pinnedMap.set(index, { index, question, answer });
-            savePinned();
-            renderPinned(index, question, answer);
-            $('#pinnedWrapper').show();
-            $btn.text('📌 Pinned').addClass('disabled');
-        });
-
-        $(document).on('click', '.btn-unpin', function () {
-            const index = $(this).data('index');
-            pinnedMap.delete(index);
-            savePinned();
-            $(`.chat-entry[data-index="${index}"]`).remove();
-            if ($('#pinnedAnswers .chat-entry').length === 0) {
-                $('#pinnedWrapper').hide();
+                `;
+                $('#pinnedAnswers').append(html);
             }
-        });
 
-         $('#togglePinned').click(function () {
-            $('#pinnedWrapper').toggleClass('collapsed');
+            function savePinned() {
+                const data = Array.from(pinnedMap.entries()).map(([index, html]) => html);
+                localStorage.setItem('pinnedAnswers', JSON.stringify(data));
+            }
 
-            const isCollapsed = $('#pinnedWrapper').hasClass('collapsed');
-            $(this).text(isCollapsed ? 'Show' : 'Hide');
-        });
+            if ($('.chat-entry').length >= 9) {
+                $('#searchWrapper').show();
+            }
 
-         $(document).on('click', '.btn-copy-answer', function () {
-            const rawHtml = $(this).closest('.chat-entry').find('.response-html').html();
-            const plainText = $('<div>').html(rawHtml).text();
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                $('#voiceBtn').hide();
+            }
 
-            navigator.clipboard.writeText(plainText).then(() => {
+            const chatHistory = $('#chatHistory');
+
+            chatHistory.on('scroll', function () {
+                const nearBottom = chatHistory[0].scrollTop + chatHistory[0].clientHeight >= chatHistory[0].scrollHeight - 100;
+                $('#scrollToBottom').toggle(!nearBottom);
+            });
+
+            $('#profileName').hover(
+                function () {
+                    $('#profileCard').fadeIn(200);
+                },
+                function () {
+                    setTimeout(() => {
+                        if (!$('#profileCard').is(':hover')) $('#profileCard').fadeOut(200);
+                    }, 300);
+                }
+            );
+
+            $('#profileCard').mouseleave(() => {
+                $('#profileCard').fadeOut(200);
+            });
+
+            $('#scrollToBottom').click(function () {
+                chatHistory[0].scrollTo({
+                    top: chatHistory[0].scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Apply special styling to any existing career-summary-card or skills-highlight-card elements
+            $('.career-summary-card').each(function() {
+                applySpecialCardStyling($(this), 'career');
+            });
+            
+            $('.skills-highlight-card').each(function() {
+                applySpecialCardStyling($(this), 'skills');
+            });
+            
+            // Watch for future chat entries with these classes
+            observeChatEntries();
+            
+            // Event handlers
+            $(document).on('click', '.btn-ask-again', function () {
+                const question = $(this).data('question');
+                if (!question) {
+                    console.error('No question found for btn-ask-again');
+                    return;
+                }
+                $('#userQuestion').val(question).focus();
+                chatApp.sendMessage('Default');
+            });
+
+            $(document).on('click', '.btn-copy-answer', function () {
+                const rawHtml = $(this).closest('.chat-entry').find('.response-html').html();
+                const plainText = $('<div>').html(rawHtml).text();
+
+                navigator.clipboard.writeText(plainText).then(() => {
+                    const $btn = $(this);
+                    $btn.text('✅ Copied!');
+                    setTimeout(() => $btn.text('📋'), 1500);
+                }).catch(() => {
+                    alert("Failed to copy text. Please try again.");
+                });
+            });
+            
+            // Pinning/unpinning handlers
+            $(document).on('click', '.btn-pin-answer', function () {
                 const $btn = $(this);
-                $btn.text('✅ Copied!');
-                setTimeout(() => $btn.text('📋 Copy'), 1500);
-            }).catch(() => {
-                alert("Failed to copy text. Please try again.");
+                const entry = $btn.closest('.chat-entry');
+                const index = $btn.data('index');
+                const question = entry.find('p').eq(0).text().replace("You:", "").trim();
+                const answer = entry.find('.response-html').html();
+
+                if (pinnedMap.has(index)) return;
+
+                pinnedMap.set(index, { index, question, answer });
+                savePinned();
+                renderPinned(index, question, answer);
+                $('#pinnedWrapper').show();
+                $btn.text('📌 Pinned').addClass('disabled');
+            });
+
+            $(document).on('click', '.btn-unpin', function () {
+                const index = $(this).data('index');
+                pinnedMap.delete(index);
+                savePinned();
+                $(`.chat-entry[data-index="${index}"]`).remove();
+                if ($('#pinnedAnswers .chat-entry').length === 0) {
+                    $('#pinnedWrapper').hide();
+                }
             });
         });
-
-        const chatHistory = $('#chatHistory');
-
-        chatHistory.on('scroll', function () {
-            const nearBottom = chatHistory[0].scrollTop + chatHistory[0].clientHeight >= chatHistory[0].scrollHeight - 100;
-            $('#scrollToBottom').toggle(!nearBottom);
-        });
-
-         $('#scrollToBottom').click(function () {
-            chatHistory[0].scrollTo({
-                top: chatHistory[0].scrollHeight,
-                behavior: 'smooth'
+        
+        // Function to apply special styling to cards to ensure they display correctly
+        function applySpecialCardStyling(element, type) {
+            // Remove the default chat-entry::before styling
+            element.find('.chat-entry::before').remove();
+            
+            // Apply specific styling based on type
+            if (type === 'career') {
+                element.css({
+                    'background-color': 'rgba(108, 99, 255, 0.08)',
+                    'border-left': '6px solid #6c63ff',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                // Apply special styling to the response-html
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'skills') {
+                element.css({
+                    'background-color': 'rgba(40, 167, 69, 0.08)',
+                    'border-left': '6px solid #28a745',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                // Apply special styling to the response-html
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            }
+        }
+        
+        // Set up a mutation observer to watch for new chat entries
+        function observeChatEntries() {
+            // Set up a MutationObserver to watch for newly added chat entries
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.addedNodes) {
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === 1) { // ELEMENT_NODE
+                                // Check if it's a career-summary-card
+                                if (node.classList.contains('career-summary-card')) {
+                                    applySpecialCardStyling($(node), 'career');
+                                }
+                                // Check if it's a skills-highlight-card
+                                if (node.classList.contains('skills-highlight-card')) {
+                                    applySpecialCardStyling($(node), 'skills');
+                                }
+                            }
+                        });
+                    }
+                });
             });
-        });
-
-
-
-
+            
+            // Start observing the chat history container
+            observer.observe(document.getElementById('chatHistory'), { 
+                childList: true, 
+                subtree: true 
+            });
+        }
     </script>
 
 </body>

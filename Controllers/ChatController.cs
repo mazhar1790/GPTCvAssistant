@@ -37,24 +37,9 @@ namespace GPTCvAssistant.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-
-            var suggestions = new List<string>
-            {
-                "Summarize Mazhar professional experience.",
-                "What are Mazhar strongest technical skills?",
-                "What types of roles best match Mazhar background?",
-                "List key projects Mazhar has worked on.",
-                "Describe Mazhar experience with AI or GPT technologies.",
-                "What leadership or team roles has Mazhar taken?",
-                "How is Mazhar experienced in software architecture?",
-                "Highlight Mazhar full stack development experience.",
-                "What industries has Mazhar worked in?",
-                "Give a quick overview of Mazhar's career."
-            };
-
             var model = new ChatModel
             {
-                SuggestedPrompts = suggestions,
+                SuggestedPrompts = GetSuggestions(),
                 History = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>()
             };
             return View("Index", model);
@@ -65,44 +50,175 @@ namespace GPTCvAssistant.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(request?.UserQuestion))
+                // First check if request itself is null
+                if (request == null)
+                {
+                    return Json(new { success = false, message = "Request is required" });
+                }
+
+                // Log the incoming request for debugging
+                Console.WriteLine($"Received request: Intent={request.Intent}, Question={request.UserQuestion ?? "null"}");
+
+                // Check if UserQuestion is null or empty only for intents that require it
+                var requiresUserQuestion = request.Intent != GPTCvAssistant.Models.RouteIntent.ClearHistory &&
+                                         request.Intent != GPTCvAssistant.Models.RouteIntent.DownloadTranscript &&
+                                         request.Intent != GPTCvAssistant.Models.RouteIntent.SuggestPrompts;
+
+                if (requiresUserQuestion && string.IsNullOrWhiteSpace(request.UserQuestion))
                 {
                     return Json(new { success = false, message = "Question is required" });
                 }
 
+                // Load existing chat history
                 var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new List<ChatExchange>();
 
-                var rawResponse = await _geminiService.AskAsync(request.UserQuestion);
-                //var rawResponse = await _openAi.AskQuestionAsync(request.UserQuestion);
-                
-                // ⬇️ Remove triple backticks if accidentally added by Gemini
+                string rawResponse;
+
+                // RouteIntent handling
+                switch (request.Intent)
+                {
+                    case GPTCvAssistant.Models.RouteIntent.ClearHistory:
+                        HttpContext.Session.Remove("ChatHistory");
+                        return Json(new { success = true, message = "History cleared" });
+
+                    case GPTCvAssistant.Models.RouteIntent.DownloadTranscript:
+                        return DownloadTranscript();
+
+                    case GPTCvAssistant.Models.RouteIntent.SearchHistory:
+                        if (string.IsNullOrWhiteSpace(request.UserQuestion))
+                            return Json(new { success = false, message = "Search term is required" });
+                            
+                        var matches = history
+                            .Where(h => h.UserQuestion.Contains(request.UserQuestion, StringComparison.OrdinalIgnoreCase)
+                                     || h.Answer.Contains(request.UserQuestion, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                        return Json(new { success = true, history = matches });
+
+                    case GPTCvAssistant.Models.RouteIntent.SuggestPrompts:
+                        return Json(new { success = true, suggestions = GetSuggestions() });
+
+                    case GPTCvAssistant.Models.RouteIntent.CareerSummary:
+                        rawResponse = await _geminiService.AskAsync(@"
+                                        Act as a Career Narrator.
+                                        Return valid HTML only (<h3>, <p>, <ul>, <li>, <strong>).
+                                        Summarize Mazhar Hayat's career as an AI Solutions Architect in Abu Dhabi.
+                                        Focus on leadership, AI solutions, .NET, LLM, RAG, and Azure expertise.
+                                        ");
+                        break;
+
+                    case GPTCvAssistant.Models.RouteIntent.SkillsHighlight:
+                        rawResponse = await _geminiService.AskAsync(@"
+                                        Act as a Technical Skills Highlighter.
+                                        Return valid HTML only (<h3>, <p>, <ul>, <li>, <strong>).
+                                        Highlight Mazhar Hayat's strongest technical skills:
+                                        - .NET ecosystem
+                                        - Large Language Models (LLM)
+                                        - Retrieval-Augmented Generation (RAG)
+                                        - Azure Cloud
+                                        - AI-powered enterprise solutions
+                                        ");
+                        break;
+
+                    default:
+                        // Normal Q&A flow - UserQuestion already validated above for this case
+                        if (string.IsNullOrWhiteSpace(request.UserQuestion))
+                        {
+                            return Json(new { success = false, message = "Question is required for default intent" });
+                        }
+                        
+                        rawResponse = await _geminiService.AskAsync(request.UserQuestion);
+                        break;
+                }
+
+                // Common post-processing for any response
                 var cleanedRaw = StripMarkdownCodeBlock(rawResponse);
-
-                // ⬇️ Sanitize for safe rendering
                 var cleanHtml = _sanitizer.Sanitize(cleanedRaw);
-
 
                 var newExchange = new ChatExchange
                 {
-                    UserQuestion = request.UserQuestion,
+                    UserQuestion = request.UserQuestion ?? $"[{request.Intent}]", // Use intent name if no question
                     Answer = cleanHtml
                 };
 
                 history.Add(newExchange);
                 HttpContext.Session.SetObjectAsJson("ChatHistory", history);
 
+                // Enhanced debugging information in response
+                var intentString = request.Intent.ToString();
+                Console.WriteLine($"Responding with intent: {intentString}");
+
                 return Json(new
                 {
                     success = true,
                     exchange = newExchange,
-                    totalCount = history.Count
+                    totalCount = history.Count,
+                    intent = intentString, // Explicitly using ToString() for clarity
+                    debug = new { 
+                        intentType = request.Intent.GetType().FullName,
+                        intentValue = (int)request.Intent
+                    }
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                Console.WriteLine($"Error in Chat method: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return Json(new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
+
+
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> AnalyzeJD([FromBody] string jobDescription)
+        {
+            var cvHtml = await _geminiService.AskAsync($@"
+                        Act as a Job Match Agent.
+                        Return valid HTML only.
+                        Tasks:
+                        - Extract core requirements from this JD.
+                        - Compare with Mazhar's CV.
+                        - Output: <h3>Match Summary</h3>, <ul>Strengths</ul>, <ul>Gaps</ul>, <h3>ATS Keywords</h3>, and a short <p>Pitch</p>.
+                        JD:
+                        {jobDescription}");
+            var clean = _sanitizer.Sanitize(cvHtml); // sanitizer already configured for h3, ul, li, p, strong :contentReference[oaicite:15]{index=15}
+                                                     // Save to session history like Chat()
+            var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new();
+            history.Add(new ChatExchange { UserQuestion = "Analyze this JD", Answer = clean });
+            HttpContext.Session.SetObjectAsJson("ChatHistory", history); // :contentReference[oaicite:16]{index=16}
+            return Json(new { success = true, html = clean });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Interview([FromBody] string targetRole)
+        {
+            // Pull progress from session
+            var step = HttpContext.Session.GetInt32("InterviewStep") ?? 0;
+            var prompt = step == 0
+              ? $"Start an interview for {targetRole}. Ask one question. HTML only."
+              : "Continue. Ask next question based on previous answer. Give brief feedback first. HTML only.";
+            var html = await _geminiService.AskAsync(prompt); // LLM returns HTML by design:contentReference[oaicite:17]{index=17}
+            HttpContext.Session.SetInt32("InterviewStep", step + 1);
+            return Json(new { success = true, html = _sanitizer.Sanitize(html) });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GenerateDoc([FromBody] dynamic req) // { type:'cover'|'cv'|'linkedin', role:'...' }
+        {
+            string type = req.type; string role = req.role;
+            var instruction = type switch
+            {
+                "cover" => $"Write a tailored cover letter for {role}. HTML only with <h3>, <p>, <ul>.",
+                "cv" => $"Rewrite CV highlights for {role} with quantified bullets. HTML only.",
+                _ => $"Rewrite LinkedIn 'About' for {role}. HTML only."
+            };
+            var html = await _openAi.AskQuestionAsync(instruction); // OpenAI path also returns HTML per rules:contentReference[oaicite:18]{index=18}
+            var clean = _sanitizer.Sanitize(html); // :contentReference[oaicite:19]{index=19}
+            return Json(new { success = true, html = clean });
+        }
+
 
         [HttpPost]
         public IActionResult ClearHistory()
@@ -172,6 +288,45 @@ namespace GPTCvAssistant.Controllers
             var match = regex.Match(input);
             return match.Success ? match.Groups[1].Value.Trim() : input;
         }
+
+        // Intent router: decide which agent behavior to trigger
+        private string DetermineIntent(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q)) return "qa";
+
+            var s = q.ToLowerInvariant();
+
+            // Job Description / Matching
+            if (Regex.IsMatch(s, @"\b(jd|job\s*description|role\s*requirements|match\s*this\s*job|ats)\b"))
+                return "jd";
+
+            // Interview simulation
+            if (Regex.IsMatch(s, @"\b(interview\s*me|mock\s*interview|ask\s*me\s*questions|practice\s*interview)\b"))
+                return "interview";
+
+            // Document generation (cover letter / CV variant / LinkedIn)
+            if (Regex.IsMatch(s, @"\b(cover\s*letter|tailored\s*cv|cv\s*variant|linkedin|about\s*section|summary\s*for\s*linkedin)\b"))
+                return "gen";
+
+            // Default: normal Q&A
+            return "qa";
+        }
+
+        private List<string> GetSuggestions()
+        {
+            return new List<string>
+                {
+                    "Summarize Mazhar’s career as an AI Solutions Architect.",
+                    "Highlight Mazhar’s expertise with .NET, LLM, RAG, and Azure.",
+                    "What leadership and team roles has Mazhar taken in Abu Dhabi?",
+                    "Explain Mazhar’s experience in building AI-powered enterprise solutions.",
+                    "Generate a quick overview of Mazhar’s projects in data and AI.",
+                    "How does Mazhar apply RAG techniques in real-world systems?",
+                    "What makes Mazhar a strong fit for AI architect roles?"
+               };
+        }
+
+
 
     }
 }
