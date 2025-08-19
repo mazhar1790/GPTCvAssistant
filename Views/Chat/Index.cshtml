@@ -56,6 +56,189 @@
                 }
             }
         }
+
+        // Job Match Agent Functions
+        function showJobAnalysisModal() {
+            const modal = new bootstrap.Modal(document.getElementById('jobAnalysisModal'));
+            modal.show();
+        }
+
+        async function analyzeJob() {
+            const jobDescription = document.getElementById('jobDescriptionInput').value.trim();
+            const companyName = document.getElementById('companyNameInput').value.trim();
+            const targetRole = document.getElementById('targetRoleInput').value.trim();
+
+            if (!jobDescription) {
+                alert('Please enter a job description.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/Chat/AnalyzeJob', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jobDescription: jobDescription,
+                        companyName: companyName,
+                        targetRole: targetRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Log the HTML for debugging
+                    console.log('Raw HTML received:', result.html);
+                    
+                    // Add to chat history with special styling
+                    const exchange = {
+                        userQuestion: `Job Analysis: ${targetRole || 'Position'} ${companyName ? `at ${companyName}` : ''}`,
+                        answer: result.html
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'JobAnalysis');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('jobAnalysisModal')).hide();
+                    
+                    // Clear form
+                    document.getElementById('jobDescriptionInput').value = '';
+                    document.getElementById('companyNameInput').value = '';
+                    document.getElementById('targetRoleInput').value = '';
+                    
+                    chatApp.showToast('Job analysis completed!');
+                } else {
+                    alert(result.message || 'Failed to analyze job');
+                }
+            } catch (error) {
+                console.error('Error analyzing job:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        async function generateCoverLetter() {
+            const jobDescription = document.getElementById('jobDescriptionInput').value.trim();
+            const companyName = document.getElementById('companyNameInput').value.trim();
+            const targetRole = document.getElementById('targetRoleInput').value.trim();
+
+            if (!jobDescription) {
+                alert('Please enter a job description.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/Chat/GenerateCoverLetter', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jobDescription: jobDescription,
+                        companyName: companyName,
+                        targetRole: targetRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `📝 Cover Letter: ${targetRole || 'Position'} ${companyName ? `at ${companyName}` : ''}`,
+                        answer: result.html
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'GenerateCoverLetter');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('jobAnalysisModal')).hide();
+                    
+                    chatApp.showToast('Cover letter generated!');
+                } else {
+                    alert(result.message || 'Failed to generate cover letter');
+                }
+            } catch (error) {
+                console.error('Error generating cover letter:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        async function optimizeForATS() {
+            const jobDescription = document.getElementById('jobDescriptionInput').value.trim();
+            const companyName = document.getElementById('companyNameInput').value.trim();
+            const targetRole = document.getElementById('targetRoleInput').value.trim();
+
+            if (!jobDescription) {
+                alert('Please enter a job description.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/Chat/OptimizeForATS', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        jobDescription: jobDescription,
+                        companyName: companyName,
+                        targetRole: targetRole
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `🔍 ATS Optimization: ${targetRole || 'Position'} ${companyName ? `at ${companyName}` : ''}`,
+                        answer: result.html
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'ATSOptimization');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('jobAnalysisModal')).hide();
+                    
+                    chatApp.showToast('ATS optimization completed!');
+                } else {
+                    alert(result.message || 'Failed to optimize for ATS');
+                }
+            } catch (error) {
+                console.error('Error optimizing for ATS:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
     </script>
 </head>
 <body>
@@ -86,6 +269,11 @@
                 Generate Cover Letter
             </button>
 
+            <!-- New Job Match Agent Button -->
+            <button class="btn btn-outline-success btn-arrow" onclick="showJobAnalysisModal()">
+                🎯 Job Match Agent
+            </button>
+
             <!-- Utilities -->
             <button class="btn btn-outline-primary" onclick="toggleSearch()">Search History</button>
             <button class="btn btn-outline-danger" onclick="chatApp.clearHistory()">Clear History</button>
@@ -93,7 +281,49 @@
             <button class="btn btn-outline-primary" onclick="prefill('reset interview')">Reset Interview</button>
         </div>
 
-
+        <!-- Job Analysis Modal -->
+        <div class="modal fade" id="jobAnalysisModal" tabindex="-1" aria-labelledby="jobAnalysisModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="jobAnalysisModalLabel">🎯 Job Match Agent</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Paste a job description below and let AI analyze the fit, highlight strengths, identify gaps, and generate tailored application materials.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="companyNameInput" class="form-label">Company Name (Optional)</label>
+                                <input type="text" class="form-control" id="companyNameInput" placeholder="e.g., Microsoft">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="targetRoleInput" class="form-label">Target Role (Optional)</label>
+                                <input type="text" class="form-control" id="targetRoleInput" placeholder="e.g., AI Solutions Architect">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="jobDescriptionInput" class="form-label">Job Description *</label>
+                            <textarea class="form-control" id="jobDescriptionInput" rows="8" 
+                                placeholder="Paste the full job description here..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-primary" onclick="analyzeJob()">
+                                <i class="fas fa-chart-line me-2"></i>Analyze Job Fit
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="generateCoverLetter()">
+                                <i class="fas fa-file-alt me-2"></i>Generate Cover Letter
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="optimizeForATS()">
+                                <i class="fas fa-search me-2"></i>ATS Optimization
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="pinnedWrapper" class="chat-history mb-4" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -451,6 +681,15 @@
                 } else if (intentLower.includes('skill') || intentLower === 'skillshighlight') {
                     console.log('Adding skills-highlight-card class');
                     cardClass = 'skills-highlight-card';
+                } else if (intentLower.includes('jobanalysis') || intentLower === 'jobanalysis') {
+                    console.log('Adding job-analysis-card class');
+                    cardClass = 'job-analysis-card';
+                } else if (intentLower.includes('generatecoverletter') || intentLower === 'generatecoverletter') {
+                    console.log('Adding generate-cover-letter-card class');
+                    cardClass = 'generate-cover-letter-card';
+                } else if (intentLower.includes('atsoptimization') || intentLower === 'atsoptimization') {
+                    console.log('Adding ats-optimization-card class');
+                    cardClass = 'ats-optimization-card';
                 }
 
                 // Add timestamp for debugging
@@ -791,6 +1030,56 @@
                     'background-color': 'transparent',
                     'border': 'none'
                 });
+            } else if (type === 'job-analysis') {
+                element.css({
+                    'background-color': 'rgba(245, 158, 11, 0.08)',
+                    'border-left': '6px solid #f59e0b',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+                
+                // Add special styling for match score
+                element.find('.match-score').css({
+                    'background': 'rgba(34, 197, 94, 0.1)',
+                    'border': '1px solid rgba(34, 197, 94, 0.2)',
+                    'border-radius': '8px',
+                    'padding': '0.75rem 1rem',
+                    'margin': '0.5rem 0 1rem 0',
+                    'text-align': 'center',
+                    'font-size': '1.1rem'
+                });
+            } else if (type === 'cover-letter') {
+                element.css({
+                    'background-color': 'rgba(139, 92, 246, 0.08)',
+                    'border-left': '6px solid #8b5cf6',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'ats-optimization') {
+                element.css({
+                    'background-color': 'rgba(6, 182, 212, 0.08)',
+                    'border-left': '6px solid #06b6d4',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
             }
         }
         
@@ -809,6 +1098,18 @@
                                 // Check if it's a skills-highlight-card
                                 if (node.classList.contains('skills-highlight-card')) {
                                     applySpecialCardStyling($(node), 'skills');
+                                }
+                                // Check if it's a job analysis card
+                                if (node.classList.contains('job-analysis-card')) {
+                                    applySpecialCardStyling($(node), 'job-analysis');
+                                }
+                                // Check if it's a cover letter card
+                                if (node.classList.contains('generate-cover-letter-card')) {
+                                    applySpecialCardStyling($(node), 'cover-letter');
+                                }
+                                // Check if it's an ATS optimization card
+                                if (node.classList.contains('ats-optimization-card')) {
+                                    applySpecialCardStyling($(node), 'ats-optimization');
                                 }
                             }
                         });

@@ -1,4 +1,5 @@
 using GPTCvAssistant;
+using GPTCvAssistant.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,14 +19,18 @@ builder.Services.AddControllersWithViews()
 // Add HttpClient service
 builder.Services.AddHttpClient();
 
+// Configure OpenAI settings
 builder.Services.Configure<OpenAISettings>(
     builder.Configuration.GetSection("OpenAI"));
 
-builder.Services.AddSingleton<OpenAiService>();
+// Configure Gemini settings using the nested class
 builder.Services.Configure<GeminiService.GeminiSettings>(
     builder.Configuration.GetSection("Gemini"));
 
+// Register services
+builder.Services.AddSingleton<OpenAiService>();
 builder.Services.AddSingleton<GeminiService>();
+builder.Services.AddSingleton<JobMatchingAgent>();
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

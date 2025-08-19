@@ -26,8 +26,21 @@ namespace GPTCvAssistant.Models
         PinAnswer,
         AskAgain,
 
-        // New ones
+        // Existing intents
         CareerSummary,
-        SkillsHighlight
+        SkillsHighlight,
+
+        // New Job Matching intents
+        JobAnalysis,
+        GenerateCoverLetter,
+        ATSOptimization,
+        ExtractKeywords
+    }
+
+    public class JobAnalysisRequest
+    {
+        public string JobDescription { get; set; }
+        public string CompanyName { get; set; } = "";
+        public string TargetRole { get; set; } = "";
     }
 }

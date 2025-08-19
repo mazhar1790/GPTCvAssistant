@@ -1,5 +1,6 @@
 ﻿using Ganss.Xss;
 using GPTCvAssistant.Models;
+using GPTCvAssistant.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,12 +16,14 @@ namespace GPTCvAssistant.Controllers
     {
         private readonly OpenAiService _openAi;
         private readonly GeminiService _geminiService;
+        private readonly JobMatchingAgent _jobMatchingAgent;
         private readonly HtmlSanitizer _sanitizer;
 
-        public ChatController(OpenAiService openAi, GeminiService geminiService)
+        public ChatController(OpenAiService openAi, GeminiService geminiService, JobMatchingAgent jobMatchingAgent)
         {
             _openAi = openAi;
             _geminiService = geminiService;
+            _jobMatchingAgent = jobMatchingAgent;
 
             _sanitizer = new HtmlSanitizer();
             _sanitizer.AllowedTags.Add("h1");
@@ -32,6 +35,10 @@ namespace GPTCvAssistant.Controllers
             _sanitizer.AllowedTags.Add("em");
             _sanitizer.AllowedTags.Add("p");
             _sanitizer.AllowedTags.Add("br");
+            _sanitizer.AllowedTags.Add("div");
+            _sanitizer.AllowedTags.Add("span");
+            _sanitizer.AllowedAttributes.Add("class");
+            _sanitizer.AllowedAttributes.Add("style");
         }
 
         [HttpGet]
@@ -167,28 +174,140 @@ namespace GPTCvAssistant.Controllers
             }
         }
 
+        // Enhanced Job Analysis endpoint using the new JobMatchingAgent
+        [HttpPost]
+        public async Task<IActionResult> AnalyzeJob([FromBody] JobAnalysisRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request?.JobDescription))
+                {
+                    return Json(new { success = false, message = "Job description is required" });
+                }
 
+                var analysis = await _jobMatchingAgent.AnalyzeJobMatchAsync(request.JobDescription);
+                var cleanHtml = _sanitizer.Sanitize(analysis.RawHtml);
 
+                // Save to session history
+                var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new();
+                history.Add(new ChatExchange 
+                { 
+                    UserQuestion = $"Analyze Job: {request.TargetRole ?? "Position"}", 
+                    Answer = cleanHtml 
+                });
+                HttpContext.Session.SetObjectAsJson("ChatHistory", history);
 
+                return Json(new { 
+                    success = true, 
+                    analysis = analysis,
+                    html = cleanHtml,
+                    intent = "JobAnalysis"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in AnalyzeJob: {ex.Message}");
+                return Json(new { success = false, message = $"Error analyzing job: {ex.Message}" });
+            }
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> GenerateCoverLetter([FromBody] JobAnalysisRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request?.JobDescription))
+                {
+                    return Json(new { success = false, message = "Job description is required" });
+                }
+
+                var coverLetterHtml = await _jobMatchingAgent.GenerateTargetedCoverLetterAsync(
+                    request.JobDescription, 
+                    request.CompanyName ?? "");
+                var cleanHtml = _sanitizer.Sanitize(coverLetterHtml);
+
+                // Save to session history
+                var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new();
+                history.Add(new ChatExchange 
+                { 
+                    UserQuestion = $"Generate Cover Letter for {request.CompanyName ?? "Position"}", 
+                    Answer = cleanHtml 
+                });
+                HttpContext.Session.SetObjectAsJson("ChatHistory", history);
+
+                return Json(new { 
+                    success = true, 
+                    html = cleanHtml,
+                    intent = "GenerateCoverLetter"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GenerateCoverLetter: {ex.Message}");
+                return Json(new { success = false, message = $"Error generating cover letter: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> OptimizeForATS([FromBody] JobAnalysisRequest request)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(request?.JobDescription))
+                {
+                    return Json(new { success = false, message = "Job description is required" });
+                }
+
+                var optimizedSummary = await _jobMatchingAgent.GenerateATSOptimizedSummaryAsync(request.JobDescription);
+                var keywords = await _jobMatchingAgent.ExtractATSKeywordsAsync(request.JobDescription);
+
+                var combinedHtml = $@"
+                    <h3>ATS-Optimized Professional Summary</h3>
+                    {optimizedSummary}
+                    
+                    <h3>Critical ATS Keywords</h3>
+                    <p><strong>Include these in your application:</strong> {string.Join(", ", keywords)}</p>
+                ";
+
+                var cleanHtml = _sanitizer.Sanitize(combinedHtml);
+
+                // Save to session history
+                var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new();
+                history.Add(new ChatExchange 
+                { 
+                    UserQuestion = "Optimize for ATS", 
+                    Answer = cleanHtml 
+                });
+                HttpContext.Session.SetObjectAsJson("ChatHistory", history);
+
+                return Json(new { 
+                    success = true, 
+                    html = cleanHtml,
+                    keywords = keywords,
+                    intent = "ATSOptimization"
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OptimizeForATS: {ex.Message}");
+                return Json(new { success = false, message = $"Error optimizing for ATS: {ex.Message}" });
+            }
+        }
+
+        // Legacy method for backward compatibility - now enhanced
         [HttpPost]
         public async Task<IActionResult> AnalyzeJD([FromBody] string jobDescription)
         {
-            var cvHtml = await _geminiService.AskAsync($@"
-                        Act as a Job Match Agent.
-                        Return valid HTML only.
-                        Tasks:
-                        - Extract core requirements from this JD.
-                        - Compare with Mazhar's CV.
-                        - Output: <h3>Match Summary</h3>, <ul>Strengths</ul>, <ul>Gaps</ul>, <h3>ATS Keywords</h3>, and a short <p>Pitch</p>.
-                        JD:
-                        {jobDescription}");
-            var clean = _sanitizer.Sanitize(cvHtml); // sanitizer already configured for h3, ul, li, p, strong :contentReference[oaicite:15]{index=15}
-                                                     // Save to session history like Chat()
-            var history = HttpContext.Session.GetObjectFromJson<List<ChatExchange>>("ChatHistory") ?? new();
-            history.Add(new ChatExchange { UserQuestion = "Analyze this JD", Answer = clean });
-            HttpContext.Session.SetObjectAsJson("ChatHistory", history); // :contentReference[oaicite:16]{index=16}
-            return Json(new { success = true, html = clean });
+            try
+            {
+                var request = new JobAnalysisRequest { JobDescription = jobDescription };
+                var result = await AnalyzeJob(request);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
 
         [HttpPost]
@@ -316,17 +435,47 @@ namespace GPTCvAssistant.Controllers
         {
             return new List<string>
                 {
-                    "Summarize Mazhar’s career as an AI Solutions Architect.",
-                    "Highlight Mazhar’s expertise with .NET, LLM, RAG, and Azure.",
+                    "Summarize Mazhar's career as an AI Solutions Architect.",
+                    "Highlight Mazhar's expertise with .NET, LLM, RAG, and Azure.",
                     "What leadership and team roles has Mazhar taken in Abu Dhabi?",
-                    "Explain Mazhar’s experience in building AI-powered enterprise solutions.",
-                    "Generate a quick overview of Mazhar’s projects in data and AI.",
+                    "Explain Mazhar's experience in building AI-powered enterprise solutions.",
+                    "Generate a quick overview of Mazhar's projects in data and AI.",
                     "How does Mazhar apply RAG techniques in real-world systems?",
-                    "What makes Mazhar a strong fit for AI architect roles?"
+                    "What makes Mazhar a strong fit for AI architect roles?",
+                    "🎯 Analyze a job description for match and generate tailored materials"
                };
         }
 
+        [HttpPost]
+        public async Task<IActionResult> TestJobAnalysis()
+        {
+            try
+            {
+                // Create a simple test job description
+                var testJobDescription = @"
+                    We are seeking a Senior .NET Developer with experience in Azure cloud services.
+                    Requirements:
+                    - 5+ years .NET Core experience
+                    - Azure Functions and Web Apps
+                    - SQL Server database design
+                    - RESTful API development
+                    - CI/CD pipeline experience
+                ";
 
+                var analysis = await _jobMatchingAgent.AnalyzeJobMatchAsync(testJobDescription);
+                var cleanHtml = _sanitizer.Sanitize(analysis.RawHtml);
 
+                return Json(new { 
+                    success = true, 
+                    rawHtml = analysis.RawHtml,
+                    cleanHtml = cleanHtml,
+                    matchScore = analysis.MatchScore
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message, stackTrace = ex.StackTrace });
+            }
+        }
     }
 }
