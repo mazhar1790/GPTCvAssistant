@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="~/content/css/chat.css" rel="stylesheet" />
+    <link href="~/content/css/advanced-features.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://js.puter.com/v2/"></script>
@@ -239,6 +240,455 @@
                 chatApp.setLoading(false);
             }
         }
+
+        <!-- Advanced Career Features Functions -->
+        function showAdvancedFeaturesModal() {
+            const modal = new bootstrap.Modal(document.getElementById('advancedFeaturesModal'));
+            modal.show();
+        }
+
+        async function conductSkillsAssessment() {
+            const modal = new bootstrap.Modal(document.getElementById('skillsAssessmentModal'));
+            modal.show();
+        }
+
+        async function analyzeSkillsGap() {
+            const targetRole = document.getElementById('targetRoleForSkills').value.trim();
+            const currentSkills = document.getElementById('currentSkillsList').value.trim().split(',').map(s => s.trim()).filter(s => s);
+            const industry = document.getElementById('industryForSkills').value.trim();
+            const experienceLevel = document.getElementById('experienceLevel').value;
+
+            if (!targetRole) {
+                alert('Please enter a target role.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/AnalyzeSkillsGap', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        targetRole: targetRole,
+                        currentSkills: currentSkills,
+                        industry: industry,
+                        experienceLevel: experienceLevel
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `🎯 Skills Gap Analysis for ${targetRole}`,
+                        answer: result.html
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'SkillsGapAnalysis');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('skillsAssessmentModal')).hide();
+                    
+                    chatApp.showToast('Skills gap analysis completed!');
+                } else {
+                    alert(result.message || 'Failed to analyze skills gap');
+                }
+            } catch (error) {
+                console.error('Error analyzing skills gap:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        async function getMarketIntelligence() {
+            const modal = new bootstrap.Modal(document.getElementById('marketIntelligenceModal'));
+            modal.show();
+        }
+
+        async function analyzeMarket() {
+            const role = document.getElementById('marketRole').value.trim();
+            const industry = document.getElementById('marketIndustry').value.trim();
+            const location = document.getElementById('marketLocation').value.trim();
+
+            if (!role) {
+                alert('Please enter a role.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/GetCareerTrends', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        role: role,
+                        industry: industry || 'Technology',
+                        location: location || 'UAE'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `📊 Market Intelligence: ${role} in ${location || 'UAE'}`,
+                        answer: result.html
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'MarketIntelligence');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('marketIntelligenceModal')).hide();
+                    
+                    chatApp.showToast('Market analysis completed!');
+                } else {
+                    alert(result.message || 'Failed to analyze market');
+                }
+            } catch (error) {
+                console.error('Error analyzing market:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        async function startVideoInterview() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('videoElement').srcObject = stream;
+                
+                // Show video interview modal
+                const modal = new bootstrap.Modal(document.getElementById('videoInterviewModal'));
+                modal.show();
+                
+                // Start interview simulation
+                const role = 'AI Solutions Architect'; // Default role
+                const response = await fetch('/AdvancedCareer/StartInterviewSimulation', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        role: role,
+                        company: 'Technology Company',
+                        interviewType: 'Technical',
+                        difficulty: 'Intermediate'
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('interviewQuestion').innerHTML = result.html;
+                }
+            } catch (error) {
+                console.error('Error starting video interview:', error);
+                alert('Camera access denied or not available. Please check your browser settings.');
+            }
+        }
+
+        async function showPersonalBrandBuilder() {
+            const modal = new bootstrap.Modal(document.getElementById('personalBrandModal'));
+            modal.show();
+        }
+
+        async function generatePersonalBrand() {
+            const currentRole = document.getElementById('brandCurrentRole').value.trim();
+            const targetRole = document.getElementById('brandTargetRole').value.trim();
+            const industry = document.getElementById('brandIndustry').value.trim();
+
+            if (!currentRole || !targetRole) {
+                alert('Please enter both current and target roles.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/CreatePersonalBrand', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentRole: currentRole,
+                        targetRole: targetRole,
+                        industry: industry || 'Technology',
+                        keySkills: ['AI', 'Machine Learning', '.NET', 'Azure', 'Leadership'],
+                        achievements: ['Led AI implementation projects', 'Delivered enterprise solutions'],
+                        personalityType: 'Technical Leader'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `🎨 Personal Brand Strategy: ${currentRole} → ${targetRole}`,
+                        answer: formatPersonalBrandResponse(result.brand)
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'PersonalBrandBuilder');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('personalBrandModal')).hide();
+                    
+                    chatApp.showToast('Personal brand strategy created!');
+                } else {
+                    alert(result.message || 'Failed to create personal brand');
+                }
+            } catch (error) {
+                console.error('Error creating personal brand:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        function formatPersonalBrandResponse(brand) {
+            return `
+                <div class="personal-brand-strategy">
+                    <h3>Your Personal Brand Strategy</h3>
+                    <div class="brand-section">
+                        <h4>Brand Message</h4>
+                        <p>${brand.brandMessage}</p>
+                    </div>
+                    <div class="brand-section">
+                        <h4>Value Proposition</h4>
+                        <p>${brand.valueProposition}</p>
+                    </div>
+                    <div class="brand-section">
+                        <h4>LinkedIn Optimization</h4>
+                        <p><strong>Headline:</strong> ${brand.linkedInStrategy.headline}</p>
+                        <p><strong>Summary:</strong> ${brand.linkedInStrategy.summary}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function showNetworkingPlan() {
+            const modal = new bootstrap.Modal(document.getElementById('networkingModal'));
+            modal.show();
+        }
+
+        async function generateNetworkingStrategy() {
+            const targetRole = document.getElementById('networkingRole').value.trim();
+            const industry = document.getElementById('networkingIndustry').value.trim();
+            const location = document.getElementById('networkingLocation').value.trim();
+
+            if (!targetRole) {
+                alert('Please enter a target role.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/GenerateNetworkingStrategy', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        targetRole: targetRole,
+                        industry: industry || 'Technology',
+                        location: location || 'UAE',
+                        networkingGoal: 'Career advancement and job opportunities'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `🤝 Networking Strategy for ${targetRole}`,
+                        answer: formatNetworkingResponse(result.strategy)
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'NetworkingStrategy');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('networkingModal')).hide();
+                    
+                    chatApp.showToast('Networking strategy created!');
+                } else {
+                    alert(result.message || 'Failed to create networking strategy');
+                }
+            } catch (error) {
+                console.error('Error creating networking strategy:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        function formatNetworkingResponse(strategy) {
+            return `
+                <div class="networking-strategy">
+                    <h3>Your Networking Strategy</h3>
+                    <div class="strategy-section">
+                        <h4>Networking Plan</h4>
+                        <p>${strategy.networkingPlan}</p>
+                    </div>
+                    <div class="strategy-section">
+                        <h4>Best Platforms</h4>
+                        <ul>
+                            ${strategy.bestPlatforms.map(platform => `<li>${platform}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="strategy-section">
+                        <h4>Recommended Events</h4>
+                        <ul>
+                            ${strategy.recommendedEvents.map(event => `<li>${event}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function showCareerPathAnalysis() {
+            const modal = new bootstrap.Modal(document.getElementById('careerPathModal'));
+            modal.show();
+        }
+
+        async function generateCareerPaths() {
+            const currentRole = document.getElementById('pathCurrentRole').value.trim();
+            const interests = document.getElementById('pathInterests').value.trim();
+            const yearsExperience = parseInt(document.getElementById('pathExperience').value) || 0;
+
+            if (!currentRole) {
+                alert('Please enter your current role.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/GetCareerPaths', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentRole: currentRole,
+                        skills: ['AI', 'Machine Learning', '.NET', 'Azure', 'Leadership'],
+                        interests: interests,
+                        yearsExperience: yearsExperience,
+                        preferredIndustry: 'Technology',
+                        careerGoals: 'Advance to senior leadership roles in AI'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const exchange = {
+                        userQuestion: `🛣️ Career Path Analysis from ${currentRole}`,
+                        answer: formatCareerPathResponse(result.recommendations)
+                    };
+                    
+                    chatApp.addChatEntry(exchange, 'CareerPathRecommendation');
+                    chatApp.scrollToBottom();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('careerPathModal')).hide();
+                    
+                    chatApp.showToast('Career path analysis completed!');
+                } else {
+                    alert(result.message || 'Failed to analyze career paths');
+                }
+            } catch (error) {
+                console.error('Error analyzing career paths:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
+
+        function formatCareerPathResponse(recommendations) {
+            return `
+                <div class="career-paths">
+                    <h3>Your Career Path Recommendations</h3>
+                    <div class="career-advice">
+                        <h4>Career Advice</h4>
+                        <p>${recommendations.careerAdvice}</p>
+                    </div>
+                    <div class="recommended-paths">
+                        <h4>Recommended Career Paths</h4>
+                        ${recommendations.recommendedPaths.map(path => `
+                            <div class="career-path">
+                                <h5>${path.title}</h5>
+                                <p>${path.description}</p>
+                                <p><strong>Timeline:</strong> ${path.timeline}</p>
+                                <p><strong>Market Demand:</strong> ${path.marketDemand}/10</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function submitInterviewAnswer() {
+            const answer = document.getElementById('interviewAnswer').value.trim();
+            if (!answer) {
+                alert('Please enter your answer.');
+                return;
+            }
+
+            try {
+                chatApp.setLoading(true);
+                
+                const response = await fetch('/AdvancedCareer/ContinueInterview', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        previousAnswer: answer,
+                        role: 'AI Solutions Architect'
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('interviewQuestion').innerHTML = result.html;
+                    document.getElementById('interviewAnswer').value = '';
+                } else {
+                    alert(result.message || 'Failed to continue interview');
+                }
+            } catch (error) {
+                console.error('Error continuing interview:', error);
+                alert('Network error occurred. Please try again.');
+            } finally {
+                chatApp.setLoading(false);
+            }
+        }
     </script>
 </head>
 <body>
@@ -274,7 +724,12 @@
                 🎯 Job Match Agent
             </button>
 
-            <!-- Utilities -->
+            <!-- New Advanced Career Tools Button -->
+            <button class="btn btn-outline-warning btn-arrow" onclick="showAdvancedFeaturesModal()">
+                🚀 Advanced Tools
+            </button>
+
+            <!-- Utilities |
             <button class="btn btn-outline-primary" onclick="toggleSearch()">Search History</button>
             <button class="btn btn-outline-danger" onclick="chatApp.clearHistory()">Clear History</button>
             <button class="btn btn-outline-primary" onclick="chatApp.downloadTranscript()">Download</button>
@@ -318,6 +773,321 @@
                             </button>
                             <button type="button" class="btn btn-info" onclick="optimizeForATS()">
                                 <i class="fas fa-search me-2"></i>ATS Optimization
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Features Modal -->
+        <div class="modal fade" id="advancedFeaturesModal" tabindex="-1" aria-labelledby="advancedFeaturesModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="advancedFeaturesModalLabel">🚀 Advanced Career Tools</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                                        <h6 class="card-title">Skills Gap Analysis</h6>
+                                        <p class="card-text small">Analyze your skills against target roles and get personalized learning recommendations.</p>
+                                        <button class="btn btn-primary btn-sm" onclick="conductSkillsAssessment()">
+                                            Start Assessment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-chart-bar fa-3x mb-3 text-success"></i>
+                                        <h6 class="card-title">Market Intelligence</h6>
+                                        <p class="card-text small">Get real-time job market insights, salary trends, and industry demand analysis.</p>
+                                        <button class="btn btn-success btn-sm" onclick="getMarketIntelligence()">
+                                            Analyze Market
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-video fa-3x mb-3 text-info"></i>
+                                        <h6 class="card-title">Video Interview Prep</h6>
+                                        <p class="card-text small">Practice interviews with AI feedback and improve your performance.</p>
+                                        <button class="btn btn-info btn-sm" onclick="startVideoInterview()">
+                                            Practice Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-star fa-3x mb-3 text-warning"></i>
+                                        <h6 class="card-title">Personal Brand Builder</h6>
+                                        <p class="card-text small">Create a compelling personal brand strategy and LinkedIn optimization plan.</p>
+                                        <button class="btn btn-warning btn-sm" onclick="showPersonalBrandBuilder()">
+                                            Build Brand
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-network-wired fa-3x mb-3 text-secondary"></i>
+                                        <h6 class="card-title">Network Builder</h6>
+                                        <p class="card-text small">Generate targeted networking strategies and find key connections.</p>
+                                        <button class="btn btn-secondary btn-sm" onclick="showNetworkingPlan()">
+                                            Build Network
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-route fa-3x mb-3 text-dark"></i>
+                                        <h6 class="card-title">Career Path Analysis</h6>
+                                        <p class="card-text small">Discover potential career paths and get recommendations for advancement.</p>
+                                        <button class="btn btn-dark btn-sm" onclick="showCareerPathAnalysis()">
+                                            Explore Paths
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills Assessment Modal -->
+        <div class="modal fade" id="skillsAssessmentModal" tabindex="-1" aria-labelledby="skillsAssessmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="skillsAssessmentModalLabel">🎯 Skills Gap Analysis</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Analyze your current skills against target roles and get personalized recommendations.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="targetRoleForSkills" class="form-label">Target Role *</label>
+                                <input type="text" class="form-control" id="targetRoleForSkills" placeholder="e.g., Senior AI Architect">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="industryForSkills" class="form-label">Industry</label>
+                                <input type="text" class="form-control" id="industryForSkills" placeholder="e.g., Technology">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="experienceLevel" class="form-label">Experience Level</label>
+                            <select class="form-select" id="experienceLevel">
+                                <option value="Entry">Entry Level (0-2 years)</option>
+                                <option value="Mid" selected>Mid Level (3-7 years)</option>
+                                <option value="Senior">Senior Level (8+ years)</option>
+                                <option value="Executive">Executive Level (15+ years)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="currentSkillsList" class="form-label">Current Skills (comma-separated)</label>
+                            <textarea class="form-control" id="currentSkillsList" rows="4" 
+                                placeholder="e.g., C#, .NET, Azure, Machine Learning, Python, SQL, Leadership"></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary" onclick="analyzeSkillsGap()">
+                                <i class="fas fa-chart-line me-2"></i>Analyze Skills Gap
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Intelligence Modal -->
+        <div class="modal fade" id="marketIntelligenceModal" tabindex="-1" aria-labelledby="marketIntelligenceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="marketIntelligenceModalLabel">📊 Market Intelligence</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Get comprehensive market insights and salary trends for your target role.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="marketRole" class="form-label">Role *</label>
+                                <input type="text" class="form-control" id="marketRole" placeholder="e.g., AI Solutions Architect">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="marketIndustry" class="form-label">Industry</label>
+                                <input type="text" class="form-control" id="marketIndustry" placeholder="e.g., Technology" value="Technology">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="marketLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="marketLocation" placeholder="e.g., UAE, Abu Dhabi" value="UAE">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" onclick="analyzeMarket()">
+                                <i class="fas fa-chart-bar me-2"></i>Analyze Market
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Interview Modal -->
+        <div class="modal fade" id="videoInterviewModal" tabindex="-1" aria-labelledby="videoInterviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="videoInterviewModalLabel">🎥 Video Interview Practice</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <video id="videoElement" autoplay muted style="width: 100%; border-radius: 8px;"></video>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="interviewQuestion" class="interview-question">
+                                    <p>Starting interview simulation...</p>
+                                </div>
+                                <div class="mt-3">
+                                    <textarea class="form-control" id="interviewAnswer" rows="4" placeholder="Your answer..."></textarea>
+                                    <button class="btn btn-primary mt-2" onclick="submitInterviewAnswer()">
+                                        Submit Answer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Brand Modal -->
+        <div class="modal fade" id="personalBrandModal" tabindex="-1" aria-labelledby="personalBrandModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="personalBrandModalLabel">🎨 Personal Brand Builder</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Create a compelling personal brand strategy tailored to your career goals.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="brandCurrentRole" class="form-label">Current Role *</label>
+                                <input type="text" class="form-control" id="brandCurrentRole" placeholder="e.g., AI Solutions Architect">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="brandTargetRole" class="form-label">Target Role *</label>
+                                <input type="text" class="form-control" id="brandTargetRole" placeholder="e.g., Head of AI">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="brandIndustry" class="form-label">Industry</label>
+                            <input type="text" class="form-control" id="brandIndustry" placeholder="e.g., Technology" value="Technology">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-warning" onclick="generatePersonalBrand()">
+                                <i class="fas fa-star me-2"></i>Generate Brand Strategy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Networking Modal -->
+        <div class="modal fade" id="networkingModal" tabindex="-1" aria-labelledby="networkingModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="networkingModalLabel">🤝 Network Building Strategy</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Build a targeted networking strategy to advance your career.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="networkingRole" class="form-label">Target Role *</label>
+                                <input type="text" class="form-control" id="networkingRole" placeholder="e.g., AI Solutions Architect">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="networkingIndustry" class="form-label">Industry</label>
+                                <input type="text" class="form-control" id="networkingIndustry" placeholder="e.g., Technology" value="Technology">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="networkingLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="networkingLocation" placeholder="e.g., UAE, Abu Dhabi" value="UAE">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-secondary" onclick="generateNetworkingStrategy()">
+                                <i class="fas fa-network-wired me-2"></i>Create Strategy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Path Modal -->
+        <div class="modal fade" id="careerPathModal" tabindex="-1" aria-labelledby="careerPathModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="careerPathModalLabel">🛣️ Career Path Analysis</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted mb-3">Discover potential career paths and get recommendations for advancement.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="pathCurrentRole" class="form-label">Current Role *</label>
+                                <input type="text" class="form-control" id="pathCurrentRole" placeholder="e.g., AI Solutions Architect">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pathExperience" class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" id="pathExperience" placeholder="e.g., 8" min="0" max="50">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="pathInterests" class="form-label">Career Interests & Goals</label>
+                            <textarea class="form-control" id="pathInterests" rows="3" 
+                                placeholder="e.g., Leadership roles, technical innovation, team management..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-dark" onclick="generateCareerPaths()">
+                                <i class="fas fa-route me-2"></i>Analyze Career Paths
                             </button>
                         </div>
                     </div>
@@ -690,6 +1460,21 @@
                 } else if (intentLower.includes('atsoptimization') || intentLower === 'atsoptimization') {
                     console.log('Adding ats-optimization-card class');
                     cardClass = 'ats-optimization-card';
+                } else if (intentLower.includes('skillsgapanalysis') || intentLower === 'skillsgapanalysis') {
+                    console.log('Adding skills-gap-analysis-card class');
+                    cardClass = 'skills-gap-analysis-card';
+                } else if (intentLower.includes('marketintelligence') || intentLower === 'marketintelligence') {
+                    console.log('Adding market-intelligence-card class');
+                    cardClass = 'market-intelligence-card';
+                } else if (intentLower.includes('personalbrandbuilder') || intentLower === 'personalbrandbuilder') {
+                    console.log('Adding personal-brand-builder-card class');
+                    cardClass = 'personal-brand-builder-card';
+                } else if (intentLower.includes('networkingstrategy') || intentLower === 'networkingstrategy') {
+                    console.log('Adding networking-strategy-card class');
+                    cardClass = 'networking-strategy-card';
+                } else if (intentLower.includes('careerpathrecommendation') || intentLower === 'careerpathrecommendation') {
+                    console.log('Adding career-path-recommendation-card class');
+                    cardClass = 'career-path-recommendation-card';
                 }
 
                 // Add timestamp for debugging
@@ -1080,6 +1865,71 @@
                     'background-color': 'transparent',
                     'border': 'none'
                 });
+            } else if (type === 'skills-gap-analysis') {
+                element.css({
+                    'background-color': 'rgba(156, 39, 176, 0.08)',
+                    'border-left': '6px solid #9c27b0',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'market-intelligence') {
+                element.css({
+                    'background-color': 'rgba(76, 175, 80, 0.08)',
+                    'border-left': '6px solid #4caf50',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'personal-brand') {
+                element.css({
+                    'background-color': 'rgba(255, 193, 7, 0.08)',
+                    'border-left': '6px solid #ffc107',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'networking') {
+                element.css({
+                    'background-color': 'rgba(108, 117, 125, 0.08)',
+                    'border-left': '6px solid #6c757d',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
+            } else if (type === 'career-path') {
+                element.css({
+                    'background-color': 'rgba(52, 58, 64, 0.08)',
+                    'border-left': '6px solid #343a40',
+                    'border-radius': '12px',
+                    'box-shadow': '0 4px 12px rgba(0,0,0,0.12)',
+                    'margin': '1rem 0'
+                });
+                
+                element.find('.response-html').css({
+                    'background-color': 'transparent',
+                    'border': 'none'
+                });
             }
         }
         
@@ -1110,6 +1960,22 @@
                                 // Check if it's an ATS optimization card
                                 if (node.classList.contains('ats-optimization-card')) {
                                     applySpecialCardStyling($(node), 'ats-optimization');
+                                }
+                                // Check for new advanced feature cards
+                                if (node.classList.contains('skills-gap-analysis-card')) {
+                                    applySpecialCardStyling($(node), 'skills-gap-analysis');
+                                }
+                                if (node.classList.contains('market-intelligence-card')) {
+                                    applySpecialCardStyling($(node), 'market-intelligence');
+                                }
+                                if (node.classList.contains('personal-brand-builder-card')) {
+                                    applySpecialCardStyling($(node), 'personal-brand');
+                                }
+                                if (node.classList.contains('networking-strategy-card')) {
+                                    applySpecialCardStyling($(node), 'networking');
+                                }
+                                if (node.classList.contains('career-path-recommendation-card')) {
+                                    applySpecialCardStyling($(node), 'career-path');
                                 }
                             }
                         });

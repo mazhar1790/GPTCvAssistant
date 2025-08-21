@@ -65,10 +65,19 @@ try
             new[] { "application/octet-stream" });
     });
 
-    // Register services with dependency injection
+    // Register core services with dependency injection
     builder.Services.AddScoped<IAiService, GeminiService>();
     builder.Services.AddScoped<OpenAiService>();
     builder.Services.AddScoped<IJobMatchingService, JobMatchingService>();
+
+    // Register advanced career services
+    builder.Services.AddScoped<ICareerAnalyticsService, CareerAnalyticsService>();
+    builder.Services.AddScoped<ISkillsAssessmentService, SkillsAssessmentService>();
+    builder.Services.AddScoped<IPersonalBrandingService, PersonalBrandingService>();
+    builder.Services.AddScoped<IInterviewService, InterviewService>();
+    builder.Services.AddScoped<IApplicationTrackingService, ApplicationTrackingService>();
+    builder.Services.AddScoped<IResumeService, ResumeService>();
+    builder.Services.AddScoped<ICareerPathService, CareerPathService>();
 
     // Add memory cache for performance
     builder.Services.AddMemoryCache();
@@ -179,7 +188,7 @@ try
         name: "default",
         pattern: "{controller=Chat}/{action=Index}/{id?}");
 
-    Log.Information("Starting GPT CV Assistant application");
+    Log.Information("Starting GPT CV Assistant application with advanced career features");
     app.Run();
 }
 catch (Exception ex)
