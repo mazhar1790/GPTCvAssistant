@@ -66,8 +66,8 @@ try
     });
 
     // Register core services with dependency injection
-    builder.Services.AddScoped<IAiService, GeminiService>();
-    builder.Services.AddScoped<OpenAiService>();
+    builder.Services.AddScoped<IAiService, OpenAiService>();
+    builder.Services.AddScoped<GeminiService>();
     builder.Services.AddScoped<IJobMatchingService, JobMatchingService>();
 
     // Register advanced career services

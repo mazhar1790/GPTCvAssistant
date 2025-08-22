@@ -307,15 +307,15 @@ namespace GPTCvAssistant.Controllers
                     return new { success = true, suggestions = AppConstants.DefaultSuggestions.Prompts };
 
                 case RouteIntent.CareerSummary:
-                    rawResponse = await _aiService.AskAsync(AppConstants.PromptTemplates.CareerSummary);
+                    rawResponse = await _openAiService.AskAsync(AppConstants.PromptTemplates.CareerSummary);
                     break;
 
                 case RouteIntent.SkillsHighlight:
-                    rawResponse = await _aiService.AskAsync(AppConstants.PromptTemplates.SkillsHighlight);
+                    rawResponse = await _openAiService.AskAsync(AppConstants.PromptTemplates.SkillsHighlight);
                     break;
 
                 default:
-                    rawResponse = await _aiService.AskAsync(request.UserQuestion!);
+                    rawResponse = await _openAiService.AskAsync(request.UserQuestion!);
                     break;
             }
 

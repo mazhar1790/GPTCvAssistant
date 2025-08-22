@@ -1,4 +1,4 @@
-using GPTCvAssistant.Configuration;
+ï»¿using GPTCvAssistant.Configuration;
 using GPTCvAssistant.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
@@ -228,7 +228,7 @@ namespace GPTCvAssistant.Services
                 .Replace("'", "'") // Fix apostrophe encoding
                 .Replace("\u201C", "\"") // Fix left quote encoding
                 .Replace("\u201D", "\"") // Fix right quote encoding
-                .Replace("•", "•") // Fix bullet point encoding
+                .Replace("â€¢", "â€¢") // Fix bullet point encoding
                 .Trim();
         }
     }

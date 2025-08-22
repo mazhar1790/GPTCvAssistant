@@ -733,6 +733,7 @@
             <button class="btn btn-outline-danger" onclick="chatApp.clearHistory()">Clear History</button>
             <button class="btn btn-outline-primary" onclick="chatApp.downloadTranscript()">Download</button>
             <button class="btn btn-outline-primary" onclick="prefill('reset interview')">Reset Interview</button>
+            -->
         </div>
 
         <!-- Job Analysis Modal -->
@@ -1097,7 +1098,6 @@
         <div id="pinnedWrapper" class="chat-history mb-4" style="display: none;">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="text-muted mb-0">📌 Pinned Answers</h6>
-                @* <button class="btn btn-sm btn-outline-secondary" id="togglePinned">Toggle</button> *@
             </div>
             <div id="pinnedAnswers" class="pinned-container"></div>
         </div>
@@ -1141,33 +1141,32 @@
             }
         </div>
 
-
-        @foreach (var prompt in Model.SuggestedPrompts)
-        {
-            if (prompt.Contains("Summarize Mazhar"))
+        <div id="suggestedPrompts" class="suggestion-scroll">
+            @foreach (var prompt in Model.SuggestedPrompts)
             {
-                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
-                        onclick="submitPrompt('@prompt', 'CareerSummary')">
-                    @prompt
-                </button>
+                if (prompt.Contains("Summarize Mazhar"))
+                {
+                    <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                            onclick="submitPrompt('@prompt', 'CareerSummary')">
+                        @prompt
+                    </button>
+                }
+                else if (prompt.Contains("Highlight"))
+                {
+                    <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                            onclick="submitPrompt('@prompt', 'SkillsHighlight')">
+                        @prompt
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-outline-primary btn-sm me-2 mb-1"
+                            onclick="submitPrompt('@prompt', 'Default')">
+                        @prompt
+                    </button>
+                }
             }
-            else if (prompt.Contains("Highlight"))
-            {
-                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
-                        onclick="submitPrompt('@prompt', 'SkillsHighlight')">
-                    @prompt
-                </button>
-            }
-            else
-            {
-                <button class="btn btn-outline-primary btn-sm me-2 mb-1"
-                        onclick="submitPrompt('@prompt', 'Default')">
-                    @prompt
-                </button>
-            }
-        }
-
-
+        </div>
 
         <div class="typing-indicator" id="typingIndicator">
             <i class="fas fa-robot me-2"></i>Activating knowledge module...
@@ -1179,15 +1178,11 @@
             <button type="button" class="btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
             <button type="button" id="submitBtn" class="btn btn-submit"><i class="fas fa-paper-plane me-2"></i>Ask</button>
         </div>
-
-
-
     </div>
 
     <button id="scrollToBottom" class="btn btn-dark position-fixed" title="Scroll to bottom">
         ⬇
     </button>
-
 
     <div id="profileCard" class="profile-card shadow-lg p-3" style="display: none;">
         <h6 class="mb-1">Mazhar Hayat</h6>
@@ -1463,7 +1458,7 @@
                     console.log('Adding skills-gap-analysis-card class');
                     cardClass = 'skills-gap-analysis-card';
                 } else if (intentLower.includes('marketintelligence') || intentLower === 'marketintelligence') {
-                    console.log('Adding market-intelligence-card class');
+                    console.log('Adding market-intelligence-card');
                     cardClass = 'market-intelligence-card';
                 } else if (intentLower.includes('personalbrandbuilder') || intentLower === 'personalbrandbuilder') {
                     console.log('Adding personal-brand-builder-card class');
